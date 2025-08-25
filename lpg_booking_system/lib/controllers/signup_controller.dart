@@ -7,7 +7,7 @@ import 'package:lpg_booking_system/models/sigunup_response.dart';
 
 class SignupController {
   Future<SignupResult?> Signup(SignupRequest request) async {
-    const String baseUrl = 'http://172.16.8.232/lpgbookingapp_api/api/Auth';
+    const String baseUrl = 'http://192.168.100.4/lpgbookingapp_api/api/Auth';
     final url = Uri.parse('$baseUrl/signup');
 
     try {

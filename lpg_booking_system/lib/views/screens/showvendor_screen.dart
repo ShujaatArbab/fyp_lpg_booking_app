@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/showvendor_controller.dart';
+import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/models/showvendor_response.dart';
 import 'package:lpg_booking_system/views/screens/placeorder_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
 class ShowVendorScreen extends StatefulWidget {
-  final String city;
-  final String userId;
-  final String name;
-  const ShowVendorScreen({
-    super.key,
-    required this.city,
-    required this.name,
-    required this.userId,
-  });
+  final LoginResponse customer;
+
+  const ShowVendorScreen({super.key, required this.customer});
 
   @override
   State<ShowVendorScreen> createState() => _ShowVendorScreenState();
@@ -24,23 +19,24 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   int selectedIndex = 0;
   List<VendorResponse> vendorList = [];
   bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
     fetchVendors();
   }
 
-  //!  function
+  //! fetch vendor API call
   Future<void> fetchVendors() async {
     try {
       final response = await VendorController().fetchVendorsByCity(
-        widget.city,
+        widget.customer.city,
         "cust",
       );
 
       setState(() {
         vendorList = response;
-        isLoading = false; // ✅ Stop loading after response
+        isLoading = false; // ✅ stop loader
       });
     } catch (e) {
       // ignore: avoid_print
@@ -54,7 +50,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //!bottom navbar
+      //! bottom navbar
       bottomNavigationBar: CustomBottomNavbar(
         currentindex: selectedIndex,
         ontap: (int index) {
@@ -63,22 +59,23 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
           });
         },
       ),
+
       body: Column(
         children: [
+          //! top header
           Container(
             width: double.infinity,
             height: 100,
-
             color: Colors.orangeAccent,
-
             child: Container(
-              margin: EdgeInsets.only(left: 30, top: 20),
+              margin: const EdgeInsets.only(left: 30, top: 20),
               child: Column(
-                //!welcome
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //! welcome text
                   Container(
-                    margin: EdgeInsets.only(top: 10),
-                    child: Row(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: const Row(
                       children: [
                         Text(
                           'Welcome',
@@ -90,32 +87,32 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                       ],
                     ),
                   ),
-                  //!  name
+                  //! name + notification icon
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        widget.name,
-                        style: TextStyle(
+                        widget.customer.name,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(right: 20),
-                        child: Icon(
+                        margin: const EdgeInsets.only(right: 20),
+                        child: const Icon(
                           Icons.notifications_none,
                           color: Colors.white,
                         ),
                       ),
                     ],
                   ),
-                  //!  userid
+                  //! userId
                   Row(
                     children: [
                       Text(
-                        'UserID:${widget.userId}',
-                        style: TextStyle(
+                        'UserID: ${widget.customer.userid}',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -126,61 +123,128 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
               ),
             ),
           ),
-          //!  region
+
+          //! region
           Container(
-            padding: EdgeInsets.only(left: 25, right: 25),
+            padding: const EdgeInsets.only(left: 25, right: 25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Text(
+                    const Text(
                       "Region : ",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.city,
-                      style: TextStyle(
+                      widget.customer.city,
+                      style: const TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.filter_alt, color: Colors.orangeAccent),
+                  icon: const Icon(
+                    Icons.filter_alt,
+                    color: Colors.orangeAccent,
+                  ),
                 ),
               ],
             ),
           ),
-          //!  card
+
+          //! card list
           Expanded(
             child:
                 isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                      itemCount: vendorList.length,
+                      // ✅ only vendors with shops will be shown
+                      itemCount:
+                          vendorList.where((v) => v.shops.isNotEmpty).length,
                       itemBuilder: (context, index) {
-                        final vendor = vendorList[index];
-                        return CustomCard(
-                          title: vendor.name,
-                          location: 'Location: ${vendor.city}',
-                          phone: vendor.phone,
-                          rating: '4.0',
-                          onplaceorder: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => PlaceorderScreen(
-                                      vendorId: vendor.userID,
-                                      vendorName: vendor.name,
-                                    ),
-                              ),
-                            );
-                          },
+                        final vendorsWithShops =
+                            vendorList
+                                .where((v) => v.shops.isNotEmpty)
+                                .toList();
+                        final vendor = vendorsWithShops[index];
+
+                        // ✅ show all shops for this vendor
+                        return Column(
+                          children:
+                              vendor.shops.map((shop) {
+                                // extract stock safely
+                                int smallQty =
+                                    shop.stock
+                                        .firstWhere(
+                                          (s) => s.cylinderId == 1,
+                                          orElse:
+                                              () => Stock(
+                                                stockId: 0,
+                                                cylinderId: 1,
+                                                quantityAvailable: 0,
+                                              ),
+                                        )
+                                        .quantityAvailable;
+
+                                int mediumQty =
+                                    shop.stock
+                                        .firstWhere(
+                                          (s) => s.cylinderId == 2,
+                                          orElse:
+                                              () => Stock(
+                                                stockId: 0,
+                                                cylinderId: 2,
+                                                quantityAvailable: 0,
+                                              ),
+                                        )
+                                        .quantityAvailable;
+
+                                int largeQty =
+                                    shop.stock
+                                        .firstWhere(
+                                          (s) => s.cylinderId == 3,
+                                          orElse:
+                                              () => Stock(
+                                                stockId: 0,
+                                                cylinderId: 3,
+                                                quantityAvailable: 0,
+                                              ),
+                                        )
+                                        .quantityAvailable;
+
+                                return CustomCard(
+                                  title: vendor.name,
+                                  location: 'Location: ${vendor.city}',
+                                  phone: vendor.phone,
+                                  rating: '4.0',
+                                  shopName: shop.shopName,
+                                  shopCity: shop.city,
+                                  smallQty: smallQty,
+                                  mediumQty: mediumQty,
+                                  largeQty: largeQty,
+                                  onplaceorder: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => PlaceorderScreen(
+                                              vendorId: vendor.userID,
+                                              vendorName: vendor.name,
+                                              vendorPhone: vendor.phone,
+                                              vendorAddress:
+                                                  "${shop.shopName}, ${shop.city}",
+                                              vendorcity: vendor.city,
+                                              customer: widget.customer,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
                         );
                       },
                     ),

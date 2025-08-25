@@ -46,8 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    //! successful
-    final userCity = response.city; // ✅ FIXED HERE
+    // ✅ FIXED HERE
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Login Successful. Welcome ${response.name}!')),
@@ -55,14 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder:
-            (_) => ShowVendorScreen(
-              city: userCity,
-              userId: response.userid,
-              name: response.name,
-            ), // ✅ Pass city correctly
-      ),
+      MaterialPageRoute(builder: (_) => ShowVendorScreen(customer: response)),
     );
   }
 
@@ -95,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-          //!text field email 
+          //!text field email
           SizedBox(height: 30),
           SizedBox(
             width: 350,
@@ -108,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
               errorText: erroremail,
             ),
           ),
-           //!text field password 
+          //!text field password
           SizedBox(height: 30),
           SizedBox(
             width: 350,
@@ -129,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-           //! button
+          //! button
           SizedBox(height: 30),
           Container(
             margin: EdgeInsets.only(left: 200),

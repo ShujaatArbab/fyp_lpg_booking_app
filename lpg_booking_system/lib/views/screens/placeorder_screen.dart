@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/orderconfirmation_screen.dart';
 import 'package:lpg_booking_system/views/screens/showvendor_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
@@ -9,16 +10,26 @@ class TankItem {
   final String size;
   final int price;
   int quantity;
+
   TankItem({required this.price, required this.quantity, required this.size});
 }
 
 class PlaceorderScreen extends StatefulWidget {
   final String vendorId;
   final String vendorName;
+  final String vendorPhone; // ✅ add this
+  final String vendorAddress;
+  final String vendorcity;
+  final LoginResponse customer;
+
   const PlaceorderScreen({
     super.key,
     required this.vendorName,
     required this.vendorId,
+    required this.vendorPhone, // ✅ add here
+    required this.vendorAddress,
+    required this.vendorcity,
+    required this.customer,
   });
 
   @override
@@ -112,10 +123,8 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
               context,
               MaterialPageRoute(
                 builder:
-                    (context) => const ShowVendorScreen(
-                      city: '',
-                      userId: '',
-                      name: '',
+                    (context) => ShowVendorScreen(
+                      customer: widget.customer,
                     ), // 👈 change screen here
               ),
             );
@@ -459,7 +468,14 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                     MaterialPageRoute(
                       builder:
                           (context) => OrderconfirmationScreen(
-                            selecteditem: selecteditem,
+                            selecteditem: selecteditem, // ✅ your chosen items
+                            vendorId: '',
+                            vendorName:
+                                widget.vendorName, // ✅ use widget.vendorName
+                            vendorPhone:
+                                widget.vendorPhone, // ✅ use widget.vendorPhone
+                            vendorAddress: widget.vendorAddress,
+                            vendorcity: widget.vendorcity,
                           ),
                     ),
                   );

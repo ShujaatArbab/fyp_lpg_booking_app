@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:lpg_booking_system/views/screens/finalorderconfirm_screen.dart';
 import 'package:lpg_booking_system/views/screens/placeorder_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
 
 class OrderconfirmationScreen extends StatefulWidget {
   final List<TankItem> selecteditem;
+  final String vendorName;
+  final String vendorAddress;
+  final String vendorPhone;
+  final String vendorcity;
 
-  const OrderconfirmationScreen({super.key, required this.selecteditem});
+  const OrderconfirmationScreen({
+    super.key,
+    required this.selecteditem,
+    required this.vendorName,
+    required this.vendorAddress,
+    required this.vendorPhone,
+    required vendorId,
+    required this.vendorcity,
+  });
 
   @override
   State<OrderconfirmationScreen> createState() =>
@@ -80,6 +94,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                               fontSize: 20,
                             ),
                           ),
+                          Expanded(child: Text(widget.vendorAddress)),
                         ],
                       ),
                       //!  my address
@@ -93,6 +108,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                               fontSize: 20,
                             ),
                           ),
+                          Text(''),
                         ],
                       ),
                     ],
@@ -164,24 +180,26 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                 Row(
                   children: [
                     Text(
-                      'Location:',
+                      'Location :  ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
+                    Text(widget.vendorcity),
                   ],
                 ),
                 SizedBox(height: 10),
                 Row(
                   children: [
                     Text(
-                      'Phone:',
+                      'Phone :  ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
+                    Text(widget.vendorPhone),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -190,7 +208,15 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                   child: Row(
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              opaque: false, // 👈 allows transparency
+                              pageBuilder:
+                                  (context, _, __) => FinalorderconfirmScreen(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                         ),

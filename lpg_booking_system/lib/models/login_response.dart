@@ -5,6 +5,7 @@ class LoginResponse {
   final String role;
   final double longitude;
   final double latitude;
+  final String phone;
   final String city;
   final String password;
   LoginResponse({
@@ -14,6 +15,7 @@ class LoginResponse {
     required this.role,
     required this.longitude,
     required this.latitude,
+    required this.phone,
     required this.city,
     required this.password,
   });
@@ -26,6 +28,7 @@ class LoginResponse {
       role: json['Role'],
       longitude: json['Longitude']?.toDouble() ?? 0.0,
       latitude: json['Latitude']?.toDouble() ?? 0.0,
+      phone: json['Phone'] ?? '',
       city: json['City'],
       password: json['Password'],
     );

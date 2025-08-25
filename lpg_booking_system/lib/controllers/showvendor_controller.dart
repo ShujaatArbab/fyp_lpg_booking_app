@@ -7,7 +7,7 @@ class VendorController {
     String city,
     String role,
   ) async {
-    const String baseUrl = 'http://172.16.8.232/lpgbookingapp_api/api/Vendors';
+    const String baseUrl = 'http://192.168.100.4/lpgbookingapp_api/api/Vendors';
     final url = Uri.parse('$baseUrl/getvendorsbycity');
 
     try {

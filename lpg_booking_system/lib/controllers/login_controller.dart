@@ -5,7 +5,7 @@ import 'package:lpg_booking_system/models/login_response.dart';
 
 class LoginController {
   Future<LoginResponse?> login(LoginRequest request) async {
-    const String baseUrl = 'http://172.16.8.232/lpgbookingapp_api/api/Auth';
+    const String baseUrl = 'http://192.168.100.4/lpgbookingapp_api/api/Auth';
     final url = Uri.parse('$baseUrl/login');
     try {
       final response = await http.post(
