@@ -57,7 +57,10 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/tikorder.png
+<<<<<<< HEAD
   
+=======
+>>>>>>> 6b0be65b97d3007188a1a14956f167ac4559507d
 
 
   # The following line ensures that the Material Icons font is

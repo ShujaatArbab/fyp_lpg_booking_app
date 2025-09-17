@@ -2,14 +2,22 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:lpg_booking_system/controllers/signup_result.dart';
+<<<<<<< HEAD
 import 'package:lpg_booking_system/global/global_IP.dart';
+=======
+>>>>>>> 6b0be65b97d3007188a1a14956f167ac4559507d
 import 'package:lpg_booking_system/models/signup_request.dart';
 import 'package:lpg_booking_system/models/sigunup_response.dart';
 
 class SignupController {
   Future<SignupResult?> Signup(SignupRequest request) async {
+<<<<<<< HEAD
     // const String baseUrl = 'http://192.168.18.62/lpgbookingapp_api/api/Auth';
     final url = Uri.parse('$baseurl/Auth/signup');
+=======
+    const String baseUrl = 'http://192.168.100.4/lpgbookingapp_api/api/Auth';
+    final url = Uri.parse('$baseUrl/signup');
+>>>>>>> 6b0be65b97d3007188a1a14956f167ac4559507d
 
     try {
       final response = await http.post(
