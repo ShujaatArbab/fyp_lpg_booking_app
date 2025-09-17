@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CustomCard extends StatelessWidget {
-  final String title;
-  final String location;
+  final String title; // Vendor name
+  final String location; // Vendor city
   final String phone;
   final String rating;
+  final String shopName; // Shop name
+  final String shopCity; // Shop city
+  final int smallQty; // Available small cylinders
+  final int mediumQty; // Available medium cylinders
+  final int largeQty; // Available large cylinders
   final VoidCallback onplaceorder;
 
   const CustomCard({
@@ -13,6 +18,11 @@ class CustomCard extends StatelessWidget {
     required this.location,
     required this.phone,
     required this.rating,
+    required this.shopName,
+    required this.shopCity,
+    required this.smallQty,
+    required this.mediumQty,
+    required this.largeQty,
     required this.onplaceorder,
   });
 
@@ -27,6 +37,7 @@ class CustomCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// Top row: Vendor Info
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -43,7 +54,6 @@ class CustomCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Title + location
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -66,12 +76,38 @@ class CustomCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
+            /// Shop details
+            Text(
+              "Shop: $shopName",
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "City: $shopCity",
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+
+            const SizedBox(height: 8),
+
+            /// Cylinder availability
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildCylinderInfo("Small", smallQty),
+                _buildCylinderInfo("Medium", mediumQty),
+                _buildCylinderInfo("Large", largeQty),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
             /// Bottom row: Phone + rating + button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
+                    const Icon(Icons.phone, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
                     Text(
                       phone,
                       style: const TextStyle(
@@ -79,7 +115,6 @@ class CustomCard extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    const SizedBox(height: 10),
                   ],
                 ),
                 Row(
@@ -97,13 +132,10 @@ class CustomCard extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.orange, width: 2),
-                    // backgroundColor: const Color.fromARGB(255, 255, 153, 0),
+                    side: const BorderSide(color: Colors.orange, width: 2),
                   ),
-                  onPressed: () {
-                    onplaceorder();
-                  },
-                  child: Text(
+                  onPressed: onplaceorder,
+                  child: const Text(
                     "Place Order",
                     style: TextStyle(
                       color: Colors.orange,
@@ -117,6 +149,23 @@ class CustomCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// Helper widget for cylinder info
+  Widget _buildCylinderInfo(String label, int qty) {
+    return Column(
+      children: [
+        Text(
+          "$qty",
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
     );
   }
 }

@@ -4,6 +4,7 @@
     <application
         android:label="lpg_booking_system"
         android:name="${applicationName}"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         
         <activity

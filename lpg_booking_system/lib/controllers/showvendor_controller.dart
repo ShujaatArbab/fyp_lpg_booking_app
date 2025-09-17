@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lpg_booking_system/global/global_IP.dart';
 import 'package:lpg_booking_system/models/showvendor_response.dart';
 
 class VendorController {
@@ -7,8 +8,8 @@ class VendorController {
     String city,
     String role,
   ) async {
-    const String baseUrl = 'http://172.16.8.232/lpgbookingapp_api/api/Vendors';
-    final url = Uri.parse('$baseUrl/getvendorsbycity');
+    // const String baseUrl = 'http://192.168.18.62/lpgbookingapp_api/api/Vendors';
+    final url = Uri.parse('$baseurl/Vendors/getvendorsbycity');
 
     try {
       final response = await http.post(
