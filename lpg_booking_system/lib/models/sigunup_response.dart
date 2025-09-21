@@ -17,6 +17,7 @@ class SignupResponse {
     this.longitude,
     this.latitude,
     required this.city,
+    required String message,
   });
 
   factory SignupResponse.fromJson(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class SignupResponse {
       email: json['email'],
       role: json['role'],
       city: json['city'],
+      message: '',
     );
   }
 }

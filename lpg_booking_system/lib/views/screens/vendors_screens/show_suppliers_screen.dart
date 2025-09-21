@@ -1,46 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/showvendor_controller.dart';
+import 'package:lpg_booking_system/controllers/vendor_controllers/show_suppliers_controller.dart';
 import 'package:lpg_booking_system/models/login_response.dart';
-import 'package:lpg_booking_system/models/showvendor_response.dart';
-import 'package:lpg_booking_system/views/screens/placeorder_screen.dart';
+import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.dart';
+import 'package:lpg_booking_system/models/vendors_models/show_supplier_response.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
-class ShowVendorScreen extends StatefulWidget {
-  final LoginResponse customer;
+class ShowSupplierScreen extends StatefulWidget {
+  final LoginResponse vendor;
 
-  const ShowVendorScreen({super.key, required this.customer});
+  const ShowSupplierScreen({super.key, required this.vendor});
 
   @override
-  State<ShowVendorScreen> createState() => _ShowVendorScreenState();
+  State<ShowSupplierScreen> createState() => _ShowSupplierScreenState();
 }
 
-class _ShowVendorScreenState extends State<ShowVendorScreen> {
-  int selectedIndex = 0;
-  List<VendorResponse> vendorList = [];
+class _ShowSupplierScreenState extends State<ShowSupplierScreen> {
+  List<SupplierResponse> supplierList = [];
   bool isLoading = true;
+  int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchVendors();
+    fetchSuppliers();
   }
 
-  //! fetch vendor API call
-  Future<void> fetchVendors() async {
+  //! fetch suppliers API call
+  Future<void> fetchSuppliers() async {
     try {
-      final response = await VendorController().fetchVendorsByCity(
-        widget.customer.city,
-        "cust",
+      final response = await SupplierController().getSuppliersByCity(
+        SupplierRequest(city: widget.vendor.city, role: "ven"),
       );
 
       setState(() {
-        vendorList = response;
-        isLoading = false; // ✅ stop loader
+        supplierList = response;
+        isLoading = false;
       });
     } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error: $e');
+      print("❌ Error: $e");
       setState(() {
         isLoading = false;
       });
@@ -50,16 +49,28 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //! bottom navbar
       bottomNavigationBar: CustomBottomNavbar(
         currentindex: selectedIndex,
         ontap: (int index) {
           setState(() {
             selectedIndex = index;
           });
+          if (index == 2) {
+            // 👈 assuming "My Orders" tab is at index 1
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => OrdersScreen(
+                      // ✅ replace with your screen
+                      vendorId:
+                          widget.vendor.userid, // or vendor/customer depending
+                    ),
+              ),
+            );
+          }
         },
       ),
-
       body: Column(
         children: [
           //! top header
@@ -92,7 +103,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        widget.customer.name,
+                        widget.vendor.name,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -111,7 +122,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                   Row(
                     children: [
                       Text(
-                        'UserID: ${widget.customer.userid}',
+                        'UserID: ${widget.vendor.userid}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -137,7 +148,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.customer.city,
+                      widget.vendor.city,
                       style: const TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
@@ -156,92 +167,90 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
             ),
           ),
 
-          //! card list
+          Center(
+            child: Container(
+              child: const Text(
+                "Suppliers",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ),
+
+          //! supplier list
           Expanded(
             child:
                 isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                      // ✅ only vendors with shops will be shown
                       itemCount:
-                          vendorList.where((v) => v.shops.isNotEmpty).length,
+                          supplierList.where((s) => s.plants.isNotEmpty).length,
                       itemBuilder: (context, index) {
-                        final vendorsWithShops =
-                            vendorList
-                                .where((v) => v.shops.isNotEmpty)
+                        final suppliersWithPlants =
+                            supplierList
+                                .where((s) => s.plants.isNotEmpty)
                                 .toList();
-                        final vendor = vendorsWithShops[index];
+                        final supplier = suppliersWithPlants[index];
 
-                        // ✅ show all shops for this vendor
                         return Column(
                           children:
-                              vendor.shops.map((shop) {
+                              supplier.plants.map((plant) {
                                 // extract stock safely
                                 int smallQty =
-                                    shop.stock
+                                    plant.stock
                                         .firstWhere(
-                                          (s) => s.cylinderId == 1,
+                                          (s) => s.cylinderID == 1,
                                           orElse:
                                               () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 1,
+                                                stockID: 0,
+                                                cylinderID: 1,
                                                 quantityAvailable: 0,
                                               ),
                                         )
                                         .quantityAvailable;
 
                                 int mediumQty =
-                                    shop.stock
+                                    plant.stock
                                         .firstWhere(
-                                          (s) => s.cylinderId == 2,
+                                          (s) => s.cylinderID == 2,
                                           orElse:
                                               () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 2,
+                                                stockID: 0,
+                                                cylinderID: 2,
                                                 quantityAvailable: 0,
                                               ),
                                         )
                                         .quantityAvailable;
 
                                 int largeQty =
-                                    shop.stock
+                                    plant.stock
                                         .firstWhere(
-                                          (s) => s.cylinderId == 3,
+                                          (s) => s.cylinderID == 3,
                                           orElse:
                                               () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 3,
+                                                stockID: 0,
+                                                cylinderID: 3,
                                                 quantityAvailable: 0,
                                               ),
                                         )
                                         .quantityAvailable;
 
                                 return CustomCard(
-                                  title: vendor.name,
-                                  location: 'Location: ${vendor.city}',
-                                  phone: vendor.phone,
-                                  rating: '4.0',
-                                  shopName: shop.shopName,
-                                  shopCity: shop.city,
+                                  title: supplier.name,
+                                  location: 'Location: ${supplier.city}',
+                                  phone: supplier.phone,
+                                  rating: '4.5',
+                                  shopName: plant.plantName,
+                                  shopCity: plant.plantCity,
                                   smallQty: smallQty,
                                   mediumQty: mediumQty,
                                   largeQty: largeQty,
                                   onplaceorder: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => PlaceorderScreen(
-                                              vendorId: vendor.userID,
-                                              vendorName: vendor.name,
-                                              vendorPhone: vendor.phone,
-                                              vendorAddress:
-                                                  "${shop.shopName}, ${shop.city}",
-                                              vendorcity: vendor.city,
-                                              customer: widget.customer,
-                                            ),
-                                      ),
-                                    );
+                                    // TODO: vendor → supplier order screen navigation
+                                    print("Order placed with ${supplier.name}");
                                   },
                                 );
                               }).toList(),

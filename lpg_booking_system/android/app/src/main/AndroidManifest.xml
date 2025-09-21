@@ -4,10 +4,10 @@
     <application
         android:label="lpg_booking_system"
         android:name="${applicationName}"
-<<<<<<< HEAD
+
         android:usesCleartextTraffic="true"
-=======
->>>>>>> 6b0be65b97d3007188a1a14956f167ac4559507d
+
+
         android:icon="@mipmap/ic_launcher">
         
         <activity
@@ -38,12 +38,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <meta-data android:name="com.google.android.geo.API_KEY"
-<<<<<<< HEAD
-                android:value="REMOVED_KEY"/>
-=======
-                android:value="AIzaSyBeDLLGNO62YqAWkxZCFEqct8v6JnSd9NQ"/>
->>>>>>> 6b0be65b97d3007188a1a14956f167ac4559507d
+        
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

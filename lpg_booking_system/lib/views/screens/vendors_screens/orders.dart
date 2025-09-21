@@ -5,15 +5,15 @@ import 'package:lpg_booking_system/views/screens/vendors_screens/deliverperson_s
 
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
-class Orders extends StatefulWidget {
+class OrdersScreen extends StatefulWidget {
   final String vendorId;
-  const Orders({super.key, required this.vendorId});
+  const OrdersScreen({super.key, required this.vendorId});
 
   @override
-  State<Orders> createState() => _OrdersState();
+  State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _OrdersState extends State<Orders> {
+class _OrdersScreenState extends State<OrdersScreen> {
   int selectedIndex = 0;
   late Future<List<Order>> futureOrders;
 
@@ -179,7 +179,7 @@ class _OrdersState extends State<Orders> {
                 ),
                 Column(
                   children: [
-                    Container(
+                    SizedBox(
                       width: 110,
                       height: 30,
                       child: ElevatedButton(

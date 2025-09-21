@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/constants.dart';
 import 'package:lpg_booking_system/controllers/signup_controller.dart';
 import 'package:lpg_booking_system/models/signup_request.dart';
-import 'package:lpg_booking_system/views/screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/input_field.dart';
 
@@ -68,11 +68,9 @@ class _SignupScreenState extends State<SignupScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(result!.error!)));
     } else if (result?.data != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Signup Successful! Welcome ${result?.data!.name}'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Signup Successful!')));
     }
   }
 
@@ -92,7 +90,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ],
           ),
-         //!  input fields name
+          //!  input fields name
           SizedBox(height: 10),
           SizedBox(
             width: 350,
@@ -190,7 +188,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
-          //!  button 
+          //!  button
           SizedBox(height: 30),
           Container(
             margin: EdgeInsets.only(left: 200),
@@ -201,7 +199,7 @@ class _SignupScreenState extends State<SignupScreen> {
               },
             ),
           ),
-          //!  signin 
+          //!  signin
           SizedBox(height: 30),
           Container(
             margin: EdgeInsets.only(left: 70),

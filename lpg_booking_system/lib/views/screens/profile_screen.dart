@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/views/screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 
 class ProfileScreen extends StatefulWidget {

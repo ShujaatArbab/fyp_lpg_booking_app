@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:lpg_booking_system/global/global_IP.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
 
 class StockService {
   static Future<Map<String, int>> getStockMap(String vendorId) async {

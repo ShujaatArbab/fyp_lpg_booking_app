@@ -1,7 +1,7 @@
 // services/order_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lpg_booking_system/global/global_IP.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
 import 'package:lpg_booking_system/models/vendororders_response.dart';
 
 class OrderService {

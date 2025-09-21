@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lpg_booking_system/global/global_IP.dart';
-import 'package:lpg_booking_system/models/deliveryperson_response.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
+import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
+
 // import your model
 
 class DeliveryPersonService {
   static Future<List<DeliveryPerson>> getDeliveryPersons(
     String vendorId,
   ) async {
-    final url = Uri.parse("$baseurl/DeliveryPersons/$vendorId");
+    final url = Uri.parse(
+      "$baseurl/DeliveryPersons/GetDeliveryPersons/$vendorId",
+    );
 
     final response = await http.get(url);
 

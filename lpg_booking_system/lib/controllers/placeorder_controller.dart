@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lpg_booking_system/global/global_IP.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
 import 'package:lpg_booking_system/models/placeorder_request.dart';
 import 'package:lpg_booking_system/models/placeorder_response.dart';
 
