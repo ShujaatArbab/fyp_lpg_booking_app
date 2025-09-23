@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/orderconfirm_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
@@ -6,13 +7,13 @@ import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
 
-class TankItem {
-  final String size;
-  final int price;
-  int quantity;
+// class TankItem {
+//   final String size;
+//   final int price;
+//   int quantity;
 
-  TankItem({required this.price, required this.quantity, required this.size});
-}
+//   TankItem({required this.price, required this.quantity, required this.size});
+// }
 
 class PlaceorderScreen extends StatefulWidget {
   final String vendorId;

@@ -118,7 +118,7 @@ class _VendorSignupScreenState extends State<VendorSignupScreen> {
           children: [
             const SizedBox(height: 80),
             const Text(
-              "CREATE ACCOUNT",
+              "VENDOR REGISTER",
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),

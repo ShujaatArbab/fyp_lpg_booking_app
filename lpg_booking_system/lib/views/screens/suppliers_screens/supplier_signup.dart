@@ -115,7 +115,7 @@ class _SupplierSignupScreenState extends State<SupplierSignupScreen> {
           children: [
             const SizedBox(height: 80),
             const Text(
-              "CREATE SUPPLIER ACCOUNT",
+              "SUPPLIER ACCOUNT",
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),

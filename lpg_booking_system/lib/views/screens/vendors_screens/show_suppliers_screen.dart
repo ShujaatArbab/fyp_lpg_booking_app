@@ -4,6 +4,8 @@ import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_response.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/ven_place_order_screen.dart';
+
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
@@ -249,8 +251,35 @@ class _ShowSupplierScreenState extends State<ShowSupplierScreen> {
                                   mediumQty: mediumQty,
                                   largeQty: largeQty,
                                   onplaceorder: () {
-                                    // TODO: vendor → supplier order screen navigation
-                                    print("Order placed with ${supplier.name}");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => VendorPlaceorderScreen(
+                                              supplierId:
+                                                  supplier
+                                                      .userID, // supplier ID
+                                              supplierName:
+                                                  supplier
+                                                      .name, // supplier name
+                                              supplierPhone:
+                                                  supplier
+                                                      .phone, // supplier phone
+                                              supplierAddress:
+                                                  supplier
+                                                      .city, // or specific address if available
+                                              supplierCity: supplier.city,
+                                              vendor:
+                                                  widget
+                                                      .vendor, // current logged-in vendor
+                                              smallQty:
+                                                  smallQty, // stock for 11kg
+                                              mediumQty:
+                                                  mediumQty, // stock for 15kg
+                                              largeQty: largeQty,
+                                            ),
+                                      ),
+                                    );
                                   },
                                 );
                               }).toList(),
