@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controllers/place_order_controller.dart';
-import 'package:lpg_booking_system/controllers/vendororders_controller.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/place_order_request.dart';

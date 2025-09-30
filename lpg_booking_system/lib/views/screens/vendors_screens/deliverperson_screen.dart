@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/deliveryperson_controller.dart';
-
 import 'package:lpg_booking_system/models/vendororders_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
 
 class DeliveryPersonListScreen extends StatefulWidget {
   final String vendorId;
+  final Order order;
 
   const DeliveryPersonListScreen({
     super.key,
     required this.vendorId,
-    required Order order,
+    required this.order,
   });
 
   @override
@@ -20,7 +20,6 @@ class DeliveryPersonListScreen extends StatefulWidget {
 
 class _DeliveryPersonListScreenState extends State<DeliveryPersonListScreen> {
   late Future<List<DeliveryPerson>> futureDeliveryPersons;
-  int? selectedDpId;
 
   @override
   void initState() {
@@ -31,12 +30,10 @@ class _DeliveryPersonListScreenState extends State<DeliveryPersonListScreen> {
   }
 
   void _selectDeliveryPerson(DeliveryPerson dp) {
-    setState(() {
-      selectedDpId = dp.dpId;
-    });
-    ScaffoldMessenger.of(
+    Navigator.pop(
       context,
-    ).showSnackBar(SnackBar(content: Text("${dp.name} selected")));
+      dp,
+    ); // ✅ return selected delivery person to previous screen
   }
 
   @override
@@ -62,68 +59,57 @@ class _DeliveryPersonListScreenState extends State<DeliveryPersonListScreen> {
           }
 
           final deliveryPersons = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: ListView.builder(
-              itemCount: deliveryPersons.length,
-              itemBuilder: (context, index) {
-                final dp = deliveryPersons[index];
-                final isSelected = selectedDpId == dp.dpId;
+          return ListView.builder(
+            padding: const EdgeInsets.only(top: 20),
+            itemCount: deliveryPersons.length,
+            itemBuilder: (context, index) {
+              final dp = deliveryPersons[index];
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 6,
-                    horizontal: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(
-                      color: isSelected ? Colors.orange : Colors.black12,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        // Name & Phone
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                dp.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: Colors.black12, width: 1),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              dp.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
                               ),
-                              const SizedBox(height: 4),
-                              Text(dp.phone),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(dp.phone),
+                          ],
                         ),
-                        // Select button
-                        ElevatedButton(
-                          onPressed:
-                              dp.isAvailable
-                                  ? () => _selectDeliveryPerson(dp)
-                                  : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                dp.isAvailable ? Colors.orange : Colors.grey,
-                          ),
-                          child: const Text(
-                            "Select",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            dp.isAvailable
+                                ? () => _selectDeliveryPerson(dp)
+                                : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              dp.isAvailable ? Colors.orange : Colors.grey,
                         ),
-                      ],
-                    ),
+                        child: const Text(
+                          "Select",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           );
         },
       ),

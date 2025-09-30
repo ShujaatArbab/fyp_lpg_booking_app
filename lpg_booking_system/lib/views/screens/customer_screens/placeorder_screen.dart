@@ -243,7 +243,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                             ),
                           ),
                           Text(
-                            'Rs 2728',
+                            'Rs 2780',
                             style: TextStyle(
                               color:
                                   selectedsize == '11kg'

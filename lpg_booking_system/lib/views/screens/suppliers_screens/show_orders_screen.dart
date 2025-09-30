@@ -1,25 +1,26 @@
+// views/screens/suppliers_screens/supplier_orders_screen.dart
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/vendororders_controller.dart';
+import 'package:lpg_booking_system/controllers/supplier_controller/supplier_order_controller.dart';
 import 'package:lpg_booking_system/models/vendororders_response.dart';
-import 'package:lpg_booking_system/views/screens/vendors_screens/view_order_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/show_order_details_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
-class OrdersScreen extends StatefulWidget {
-  final String vendorId;
-  const OrdersScreen({super.key, required this.vendorId});
+class SupplierOrdersScreen extends StatefulWidget {
+  final String supplierId;
+  const SupplierOrdersScreen({super.key, required this.supplierId});
 
   @override
-  State<OrdersScreen> createState() => _OrdersScreenState();
+  State<SupplierOrdersScreen> createState() => _SupplierOrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen> {
+class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
   int selectedIndex = 0;
   late Future<List<Order>> futureOrders;
 
   @override
   void initState() {
     super.initState();
-    futureOrders = OrderService.getVendorOrders(widget.vendorId);
+    futureOrders = GetOrderService.getSupplierOrders(widget.supplierId);
   }
 
   @override
@@ -35,7 +36,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       appBar: AppBar(
         title: const Text(
-          'Orders',
+          'Supplier Orders',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.orange,
@@ -49,7 +50,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No orders found"));
+            return const Center(child: Text("No supplier orders found"));
           }
 
           final orders = snapshot.data!;
@@ -65,7 +66,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  /// Simplified card UI (NO PRICE)
   Widget buildOrderCard(Order order) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -84,8 +84,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
-            Text("CustomerId: ${order.buyerName}"),
-            Text(order.buyerCity), // show address
+            Text("Customer: ${order.buyerName}"),
+            Text(order.buyerCity),
+            Text("Status: ${order.status}"),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
@@ -103,9 +104,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     context,
                     MaterialPageRoute(
                       builder:
-                          (context) => OrderDetailScreen(
-                            order: order,
-                            vendorId: widget.vendorId,
+                          (context) => SupplierOrderDetailScreen(
+                            order: order, // 👈 pass the selected order
+                            supplierId: widget.supplierId,
                           ),
                     ),
                   );
