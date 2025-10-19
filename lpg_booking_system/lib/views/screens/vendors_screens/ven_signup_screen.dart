@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/constants.dart';
-import 'package:lpg_booking_system/controllers/vendor_controllers/vendor_signup_controller.dart';
+import 'package:lpg_booking_system/controllers/vendor_controller/vendor_signup_controller.dart';
 import 'package:lpg_booking_system/models/vendors_models/vendor_signup_request.dart';
 import 'package:lpg_booking_system/models/vendors_models/vendor_signup_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';

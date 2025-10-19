@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/vendor_controllers/add_deliveryperson_controller.dart';
-
-import 'package:lpg_booking_system/models/login_response.dart'; // ✅ import LoginResponse
+import 'package:lpg_booking_system/controllers/vendor_controller/add_deliveryperson_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/add_deliveryperson_request.dart';
 import 'package:lpg_booking_system/models/vendors_models/add_deliveryperson_response.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';

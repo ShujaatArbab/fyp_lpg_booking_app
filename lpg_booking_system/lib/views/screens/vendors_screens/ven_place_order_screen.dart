@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
-import 'package:lpg_booking_system/models/login_response.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_orderconfirm_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';

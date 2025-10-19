@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/deliveryperson_controller.dart';
-import 'package:lpg_booking_system/models/vendororders_response.dart';
+import 'package:lpg_booking_system/controllers/vendor_controller/deliveryperson_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
 
 class DeliveryPersonListScreen extends StatefulWidget {

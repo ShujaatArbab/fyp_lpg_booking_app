@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/vendor_controllers/show_suppliers_controller.dart';
-import 'package:lpg_booking_system/models/login_response.dart';
+import 'package:lpg_booking_system/controllers/vendor_controller/show_suppliers_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_response.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/add_deliveryperson_screen.dart';

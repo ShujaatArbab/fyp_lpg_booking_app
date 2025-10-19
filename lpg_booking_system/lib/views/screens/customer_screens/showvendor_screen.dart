@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/notifications_controller.dart';
-import 'package:lpg_booking_system/controllers/showvendor_controller.dart';
-import 'package:lpg_booking_system/models/login_response.dart';
-import 'package:lpg_booking_system/models/showvendor_response.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/notifications_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/showvendor_conroller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/models/customers_models/showvendor_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/placeorder_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';

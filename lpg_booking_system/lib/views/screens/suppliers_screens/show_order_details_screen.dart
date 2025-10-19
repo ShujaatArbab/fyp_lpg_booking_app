@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/accept_order_controller.dart';
-import 'package:lpg_booking_system/models/vendororders_response.dart';
+import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
 
 class SupplierOrderDetailScreen extends StatefulWidget {
   final Order order;

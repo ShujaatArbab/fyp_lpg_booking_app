@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lpg_booking_system/global/global_ip.dart';
-import 'package:lpg_booking_system/models/vendororders_response.dart';
+import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
 
 class GetOrderService {
   /// ✅ Get orders where supplier is the seller (Vendor → Supplier orders)

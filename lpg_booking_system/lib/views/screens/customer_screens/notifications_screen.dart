@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/notifications_controller.dart';
-import 'package:lpg_booking_system/models/login_response.dart';
-import 'package:lpg_booking_system/models/notifications_response.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/notifications_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/models/customers_models/notifications_response.dart';
 
 class NotificationsScreen extends StatefulWidget {
   final LoginResponse customer;

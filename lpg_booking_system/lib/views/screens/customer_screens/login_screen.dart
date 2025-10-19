@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/constants.dart';
-import 'package:lpg_booking_system/controllers/login_controller.dart';
-import 'package:lpg_booking_system/models/login_request.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/login_controler.dart';
+import 'package:lpg_booking_system/models/customers_models/login_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
 import 'package:lpg_booking_system/views/screens/roleselection_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/placeorder_controller.dart';
-import 'package:lpg_booking_system/controllers/stock_services_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/placeorder_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/stockservices_controller.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
-import 'package:lpg_booking_system/models/login_response.dart';
-import 'package:lpg_booking_system/models/placeorder_request.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/models/customers_models/placeorder_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';

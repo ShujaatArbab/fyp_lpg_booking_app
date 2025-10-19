@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/controllers/vendor_controllers/add_shop_controller.dart';
+import 'package:lpg_booking_system/controllers/vendor_controller/add_shop_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/add_shop_response.dart';
-import 'package:lpg_booking_system/models/vendors_models/addshop_request.dart';
-import 'package:lpg_booking_system/models/login_response.dart'; // import your LoginResponse
+import 'package:lpg_booking_system/models/vendors_models/addshop_request.dart'; // import your LoginResponse
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 
 class AddShopScreen extends StatefulWidget {
