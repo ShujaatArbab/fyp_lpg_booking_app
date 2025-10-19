@@ -106,7 +106,7 @@ class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
             const SizedBox(height: 30),
             isLoading
                 ? const CircularProgressIndicator()
-                : CustomButton(text: 'Save', onpressed: saveDeliveryPerson),
+                : CustomButton(text: 'Add', onpressed: saveDeliveryPerson),
           ],
         ),
       ),

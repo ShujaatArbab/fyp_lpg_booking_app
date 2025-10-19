@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/controllers/notifications_controller.dart';
 import 'package:lpg_booking_system/controllers/showvendor_controller.dart';
 import 'package:lpg_booking_system/models/login_response.dart';
 import 'package:lpg_booking_system/models/showvendor_response.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/placeorder_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
@@ -17,6 +19,7 @@ class ShowVendorScreen extends StatefulWidget {
 
 class _ShowVendorScreenState extends State<ShowVendorScreen> {
   int selectedIndex = 0;
+  int unreadCount = 0;
   List<VendorResponse> vendorList = [];
   bool isLoading = true;
 
@@ -24,6 +27,21 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   void initState() {
     super.initState();
     fetchVendors();
+    fetchUnreadNotifications();
+  }
+
+  //! fetch unred notification
+  Future<void> fetchUnreadNotifications() async {
+    try {
+      final count = await NotificationController().fetchUnreadCount(
+        widget.customer.userid,
+      );
+      setState(() {
+        unreadCount = count;
+      });
+    } catch (e) {
+      print('❌ Error fetching unread count: $e');
+    }
   }
 
   //! fetch vendor API call
@@ -62,65 +80,110 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
 
       body: Column(
         children: [
-          //! top header
+          //! ✅ top header (overflow fixed)
           Container(
             width: double.infinity,
-            height: 100,
             color: Colors.orangeAccent,
-            child: Container(
-              margin: const EdgeInsets.only(left: 30, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //! welcome text
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    child: const Row(
-                      children: [
-                        Text(
-                          'Welcome',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+            padding: const EdgeInsets.only(
+              left: 30,
+              top: 30,
+              bottom: 15,
+              right: 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //! welcome text
+                const Row(
+                  children: [
+                    Text(
+                      'Welcome',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  //! name + notification icon
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.customer.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  ],
+                ),
+                //! name + notification icon
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.customer.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(right: 20),
-                        child: const Icon(
-                          Icons.notifications_none,
-                          color: Colors.white,
-                        ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Stack(
+                        clipBehavior:
+                            Clip.none, // ✅ ensures badge can overflow slightly
+                        children: [
+                          IconButton(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => NotificationsScreen(
+                                        customer: widget.customer,
+                                      ),
+                                ),
+                              );
+                              // 👇 refresh count when returning
+                              fetchUnreadNotifications();
+                            },
+                            icon: const Icon(
+                              Icons.notifications_none,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+
+                          // 🔴 Notification badge — shows on top-right corner of icon
+                          if (unreadCount > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                width: 22, // 🔹 control size here
+                                height: 22, // 🔹 control size here
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  unreadCount.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    ],
-                  ),
-                  //! userId
-                  Row(
-                    children: [
-                      Text(
-                        'UserID: ${widget.customer.userid}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                  ],
+                ),
+                //! userId
+                Row(
+                  children: [
+                    Text(
+                      'UserID: ${widget.customer.userid}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
 

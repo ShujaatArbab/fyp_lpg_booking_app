@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendororders_controller.dart';
 import 'package:lpg_booking_system/models/vendororders_response.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/view_order_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
@@ -27,12 +28,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Scaffold(
       bottomNavigationBar: CustomBottomNavbar(
         currentindex: selectedIndex,
-        ontap: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
+        ontap: (int index) {},
       ),
+
       appBar: AppBar(
         title: const Text(
           'Orders',
@@ -84,7 +82,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
-            Text("CustomerId: ${order.buyerName}"),
+            Text("Customer Name: ${order.buyerName}"),
             Text(order.buyerCity), // show address
             const SizedBox(height: 12),
             Align(

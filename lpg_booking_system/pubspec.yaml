@@ -57,6 +57,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/tikorder.png
+    - assets/images/SplashScreen.png
+
+
 
   
 

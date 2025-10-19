@@ -132,7 +132,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
             const SizedBox(height: 30),
             isLoading
                 ? const CircularProgressIndicator()
-                : CustomButton(text: 'Save', onpressed: saveShop),
+                : CustomButton(text: 'Add', onpressed: saveShop),
           ],
         ),
       ),

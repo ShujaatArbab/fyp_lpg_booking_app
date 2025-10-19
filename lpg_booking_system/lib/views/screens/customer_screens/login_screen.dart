@@ -5,7 +5,7 @@ import 'package:lpg_booking_system/models/login_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
 import 'package:lpg_booking_system/views/screens/roleselection_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';
-import 'package:lpg_booking_system/views/screens/vendors_screens/show_suppliers_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/input_field.dart';
 
@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Vendor → go to Orders screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => ShowSupplierScreen(vendor: response)),
+        MaterialPageRoute(builder: (_) => Vendordashboard(vendor: response)),
       );
     } else if (response.userid.startsWith("C-")) {
       // Customer → go to vendor browsing screen
