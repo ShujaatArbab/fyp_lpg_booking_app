@@ -17,47 +17,32 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       NotificationController();
   List<NotificationResponse> _notifications = [];
   bool _isLoading = true;
-  bool _isMarking = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchNotifications();
+    _fetchAndMarkNotifications();
   }
 
-  Future<void> _fetchNotifications() async {
+  Future<void> _fetchAndMarkNotifications() async {
     try {
+      // 1️⃣ Fetch notifications (so we can display them)
       final result = await _notificationController.fetchNotifications(
         widget.customer.userid,
       );
+
       setState(() {
         _notifications = result;
         _isLoading = false;
       });
+
+      // 2️⃣ Once displayed, mark them as read (IsRead = 1)
+      if (result.isNotEmpty) {
+        await _notificationController.markAllAsRead(widget.customer.userid);
+      }
     } catch (e) {
       print("❌ Error loading notifications: $e");
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _markAllAsRead() async {
-    setState(() => _isMarking = true);
-    final success = await _notificationController.markAllAsRead(
-      widget.customer.userid,
-    );
-    setState(() => _isMarking = false);
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ All notifications marked as read")),
-      );
-      _fetchNotifications();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Failed to mark notifications")),
-      );
+      setState(() => _isLoading = false);
     }
   }
 
@@ -79,69 +64,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ? const Center(child: Text('No notifications found.'))
               : ListView.builder(
                 padding: const EdgeInsets.only(bottom: 20),
-                itemCount: _notifications.length + 1, // extra for button
+                itemCount: _notifications.length,
                 itemBuilder: (context, index) {
-                  if (index < _notifications.length) {
-                    final notif = _notifications[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                  final notif = _notifications[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    elevation: 3,
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.notifications_active,
+                        color: Colors.orange,
                       ),
-                      elevation: 3,
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.notifications_active,
-                          color: Colors.orange,
-                        ),
-                        title: Text(
-                          notif.message,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          "Date: ${notif.createdOn.toLocal().toString().split(' ')[0]}",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black54,
-                          ),
+                      title: Text(
+                        notif.message,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        "Date: ${notif.createdOn.toLocal().toString().split(' ')[0]}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
                         ),
                       ),
-                    );
-                  } else {
-                    // ✅ "Got it" button after list
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: _isMarking ? null : _markAllAsRead,
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: Colors.orange, width: 2),
-                            ),
-                          ),
-                          child:
-                              _isMarking
-                                  ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                  : const Text(
-                                    "Got it",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                        ),
-                      ),
-                    );
-                  }
+                    ),
+                  );
                 },
               ),
     );

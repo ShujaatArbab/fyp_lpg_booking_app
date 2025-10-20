@@ -3,6 +3,7 @@ import 'package:lpg_booking_system/controllers/customer_controller/notifications
 import 'package:lpg_booking_system/controllers/customer_controller/showvendor_conroller.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/showvendor_response.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/placeorder_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
@@ -75,6 +76,16 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
           setState(() {
             selectedIndex = index;
           });
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        MyOrdersScreen(buyerId: widget.customer.userid),
+              ),
+            );
+          }
         },
       ),
 
@@ -119,11 +130,11 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                     Container(
                       margin: const EdgeInsets.only(right: 10),
                       child: Stack(
-                        clipBehavior:
-                            Clip.none, // ✅ ensures badge can overflow slightly
+                        clipBehavior: Clip.none,
                         children: [
                           IconButton(
                             onPressed: () async {
+                              // 👇 Just open notifications screen — no API call yet
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -133,8 +144,9 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                       ),
                                 ),
                               );
-                              // 👇 refresh count when returning
-                              fetchUnreadNotifications();
+
+                              // 👇 After returning, refresh unread count
+                              await fetchUnreadNotifications();
                             },
                             icon: const Icon(
                               Icons.notifications_none,
@@ -143,14 +155,14 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                             ),
                           ),
 
-                          // 🔴 Notification badge — shows on top-right corner of icon
+                          // 🔴 Badge
                           if (unreadCount > 0)
                             Positioned(
                               right: 6,
                               top: 6,
                               child: Container(
-                                width: 22, // 🔹 control size here
-                                height: 22, // 🔹 control size here
+                                width: 22,
+                                height: 22,
                                 decoration: const BoxDecoration(
                                   color: Colors.red,
                                   shape: BoxShape.circle,
@@ -313,6 +325,10 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                                   "${shop.shopName}, ${shop.city}",
                                               vendorcity: vendor.city,
                                               customer: widget.customer,
+                                              smallQty: smallQty, // ✅ add this
+                                              mediumQty:
+                                                  mediumQty, // ✅ add this
+                                              largeQty: largeQty,
                                             ),
                                       ),
                                     );

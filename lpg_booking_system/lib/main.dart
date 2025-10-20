@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginScreen(),
+      home: SplashScreen(),
     );
   }
 }
