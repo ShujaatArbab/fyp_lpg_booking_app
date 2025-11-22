@@ -187,7 +187,7 @@ class _VendordashboardState extends State<Vendordashboard> {
                           ),
                         );
                       },
-                      child: Container(
+                      child: SizedBox(
                         width: 60,
                         height: 50,
                         child: Card(

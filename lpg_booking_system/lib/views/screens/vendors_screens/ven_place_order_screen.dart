@@ -226,7 +226,7 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
                         quantity.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                       ),
                       IconButton(

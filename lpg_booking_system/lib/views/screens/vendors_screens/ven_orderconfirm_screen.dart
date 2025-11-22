@@ -112,7 +112,17 @@ class _VendorOrderConfirmationScreenState
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => FinalorderconfirmScreen(orderid: orderId),
+        builder:
+            (_) => FinalorderconfirmScreen(
+              orderid: orderId,
+              selecteditem: widget.selectedItems,
+              vendorName: widget.supplierName,
+              vendorAddress: widget.supplierAddress,
+              vendorPhone: widget.supplierPhone,
+              vendorCity: widget.supplierCity,
+              vendorId: widget.supplierId,
+              customer: widget.vendor,
+            ),
       );
     } catch (e) {
       ScaffoldMessenger.of(

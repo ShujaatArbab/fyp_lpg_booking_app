@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/placeorder_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/stockservices_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/accessories_controller.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
+import 'package:lpg_booking_system/models/customers_models/accessories_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/placeorder_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
@@ -35,10 +37,62 @@ class OrderconfirmationScreen extends StatefulWidget {
 
 class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
   Map<String, int> stockMap = {};
-
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadStock(widget.vendorId);
+  }
+
+  /// Load stock map from API
+  Future<void> loadStock(String vendorId) async {
+    try {
+      final map = await StockService.getStockMap(vendorId);
+      setState(() {
+        stockMap = map;
+      });
+    } catch (e) {
+      print("Error loading stock: $e");
+    }
+  }
+
+  /// Place accessories for a single cylinder
+  Future<void> placeAccessories(TankItem item) async {
+    if (item.accessories == null || item.accessories!.isEmpty) return;
+
+    final controller = AccessoriesController();
+    final request = AccessoriesRequest(
+      userId: widget.customer.userid,
+      cylinderId: getCylinderId(item.size),
+      usagePurpose: item.accessories!.join(', '),
+    );
+
+    try {
+      await controller.placeAccessoriesOrder(request);
+      // Optional: show success message
+    } catch (e) {
+      print("Accessories API failed: $e");
+      // Optional: show error snackbar
+    }
+  }
+
+  /// Map tank size to cylinder ID for Accessories API
+  int getCylinderId(String size) {
+    switch (size) {
+      case '11kg':
+        return 1;
+      case '15kg':
+        return 2;
+      case '45kg':
+        return 3;
+      default:
+        return 0;
+    }
+  }
+
+  /// Place order API call
   Future<void> _placeOrder() async {
-    final buyerId = widget.customer.userid;
     if (widget.selecteditem.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please add at least one cylinder")),
@@ -49,26 +103,18 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     setState(() {
       _isLoading = true;
     });
-    final sellerId = widget.vendorId; // seller ID from previous screen
-    final items = <OrderItemRequest>[];
 
-    for (var c in widget.selecteditem) {
-      final stockId = stockMap[c.size];
-      if (stockId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Stock  not found for ${c.size}")),
-        );
-        setState(() => _isLoading = false);
-        return;
-      }
-      items.add(OrderItemRequest(stockId: stockId, quantity: c.quantity));
-    }
+    final sellerId = widget.vendorId;
 
-    // API returned Seller ID
     try {
-      // Build request model
+      // First, call Accessories API for each cylinder if accessories exist
+      for (var item in widget.selecteditem) {
+        await placeAccessories(item);
+      }
+
+      // Build order request
       final request = OrderRequest(
-        buyerId: buyerId,
+        buyerId: widget.customer.userid,
         sellerId: sellerId,
         city: widget.vendorcity,
         items:
@@ -80,15 +126,26 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
             }).toList(),
       );
 
-      // Call API
+      // Place order API call
       final response = await OrderController().placeOrder(request);
       final orderId = response.orderId;
-      // ✅ Success → Navigate to final order confirmation
+
+      // Navigate to final confirmation
       showDialog(
         context: context,
-        barrierColor: Colors.black.withOpacity(0.5), // dim background
+        barrierColor: Colors.black.withOpacity(0.5),
         barrierDismissible: false,
-        builder: (_) => FinalorderconfirmScreen(orderid: orderId),
+        builder:
+            (_) => FinalorderconfirmScreen(
+              orderid: orderId,
+              selecteditem: widget.selecteditem,
+              vendorName: widget.vendorName,
+              vendorAddress: widget.vendorAddress,
+              vendorPhone: widget.vendorPhone,
+              vendorCity: widget.vendorcity,
+              customer: widget.customer,
+              vendorId: widget.vendorId,
+            ),
       );
     } catch (e) {
       ScaffoldMessenger.of(
@@ -101,223 +158,136 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     }
   }
 
-  /// Map tank size to stock_id
-  Future<void> loadStock(String vendorId) async {
-    try {
-      final map = await StockService.getStockMap(vendorId);
-      setState(() {
-        stockMap = map; // e.g. { "11kg": 10, "15kg": 1017, "45kg": 1019 }
-      });
-    } catch (e) {
-      print("Error loading stock: $e");
-    }
-  }
-
-  final List<String> tanksize = ['11kg', '15kg', '45kg'];
-  String? selectedsize;
-  int selectedIndex = 0;
-  int quantity = 1;
-  List<TankItem> selecteditem = [];
-  final Map<String, int> tankprices = {
-    '11kg': 2780,
-    '15kg': 3720,
-    '45kg': 11160,
-  };
-  void selectSize(String size) {
+  void deleteCylinder(int index) {
     setState(() {
-      selectedsize = size;
-      quantity = 1;
+      widget.selecteditem.removeAt(index);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadStock(widget.vendorId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //!bottom bar
       bottomNavigationBar: CustomBottomNavbar(
-        currentindex: selectedIndex,
+        currentindex: 0,
         ontap: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
+          setState(() {});
         },
       ),
-      //!  title appbar
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Order Confirmation',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.orange,
         centerTitle: true,
+        backgroundColor: Colors.orange,
       ),
-
       body: Column(
         children: [
+          // Vendor & Customer Info
           Container(
-            width: 500,
-            height: 100,
-            padding: EdgeInsets.only(left: 10, top: 10),
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: Colors.orange, width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
-            //!  vendor
-            margin: EdgeInsets.only(left: 20, right: 20, top: 20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Vendor address: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          Expanded(child: Text(widget.vendorAddress)),
-                        ],
-                      ),
-                      //!  my address
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Text(
-                            'My address: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          Text(widget.customer.city),
-                        ],
-                      ),
-                    ],
+                Text(
+                  'Vendor Address: ${widget.vendorAddress}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'My Address: ${widget.customer.city}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
           ),
-          //!  products
-          SizedBox(height: 20),
-          Row(
-            children: [
-              Container(
-                margin: EdgeInsets.only(left: 20),
-                child: Text(
-                  'Products: ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                ),
+          const SizedBox(height: 20),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text(
+                'Products:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
               ),
-            ],
-          ),
-          SizedBox(
-            height: 320,
-            child: Expanded(
-              child:
-                  widget.selecteditem.isEmpty
-                      ? Center(child: Text("No products added"))
-                      : ListView.builder(
-                        itemCount: widget.selecteditem.length,
-                        itemBuilder: (context, index) {
-                          final cylinder = widget.selecteditem[index];
-                          return CustomCylinderCard(
-                            size: cylinder.size,
-                            price: cylinder.price,
-                            quantity: cylinder.quantity,
-
-                            onDelete: () {
-                              // optional delete in confirmation
-                              setState(() {
-                                widget.selecteditem.removeAt(index);
-                              });
-                            },
-                            extraWidget: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                side: BorderSide(
-                                  color: Colors.orange,
-                                  width: 2,
-                                ),
-                                backgroundColor: Colors.white,
-                              ),
-                              child: Text(
-                                'Schedule',
-                                style: TextStyle(
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
             ),
           ),
+          const SizedBox(height: 10),
+
+          // List of selected cylinders
+          Expanded(
+            child:
+                widget.selecteditem.isEmpty
+                    ? const Center(child: Text("No products added"))
+                    : ListView.builder(
+                      itemCount: widget.selecteditem.length,
+                      itemBuilder: (context, index) {
+                        final cylinder = widget.selecteditem[index];
+                        return CustomCylinderCard(
+                          size: cylinder.size,
+                          price: cylinder.price,
+                          quantity: cylinder.quantity,
+                          onDelete: () => deleteCylinder(index),
+                          extraWidget: null,
+                        );
+                      },
+                    ),
+          ),
+
+          // Vendor location & phone
           Container(
-            padding: EdgeInsets.only(left: 50),
+            padding: const EdgeInsets.only(left: 50, bottom: 20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Location :  ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Text(widget.vendorcity),
-                  ],
+                Text(
+                  'Location: ${widget.vendorcity}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Text(
-                      'Phone :  ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Text(widget.vendorPhone),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.only(left: 90),
-                  child: Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: stockMap.isEmpty ? null : _placeOrder,
-
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                        ),
-                        child: Text(
-                          'Place Order',
-
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 10),
+                Text(
+                  'Phone: ${widget.vendorPhone}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
+            ),
+          ),
+
+          // Place Order Button
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _placeOrder,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              child:
+                  _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                        'Place Order',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
             ),
           ),
         ],

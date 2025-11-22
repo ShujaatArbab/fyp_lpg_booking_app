@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/global/tank_item.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'dart:ui';
+
+import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 
 class FinalorderconfirmScreen extends StatefulWidget {
   final int orderid;
-  const FinalorderconfirmScreen({super.key, required this.orderid});
+  final List<TankItem> selecteditem;
+  final String vendorName;
+  final String vendorAddress;
+  final String vendorPhone;
+  final String vendorCity;
+  final LoginResponse customer;
+  final String vendorId;
+  const FinalorderconfirmScreen({
+    super.key,
+    required this.orderid,
+    required this.selecteditem,
+    required this.vendorName,
+    required this.vendorAddress,
+    required this.vendorPhone,
+    required this.vendorCity,
+    required this.customer,
+    required this.vendorId,
+  });
 
   @override
   State<FinalorderconfirmScreen> createState() =>
@@ -81,7 +102,24 @@ class _FinalorderconfirmScreenState extends State<FinalorderconfirmScreen> {
 
                       SizedBox(height: 20),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => CustomerOrderDetails(
+                                    orderid: widget.orderid,
+                                    selecteditem: widget.selecteditem,
+                                    vendorName: widget.vendorName,
+                                    vendorAddress: widget.vendorAddress,
+                                    vendorPhone: widget.vendorPhone,
+                                    vendorCity: widget.vendorCity,
+                                    customer: widget.customer,
+                                    vendorId: widget.vendorId,
+                                  ),
+                            ),
+                          );
+                        },
                         child: Text(
                           'View Order',
                           style: TextStyle(
