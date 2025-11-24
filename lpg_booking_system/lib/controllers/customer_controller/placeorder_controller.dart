@@ -5,8 +5,6 @@ import 'package:lpg_booking_system/models/customers_models/placeorder_request.da
 import 'package:lpg_booking_system/models/customers_models/placeorder_response.dart';
 
 class OrderController {
-  // final String baseUrl = "http://10.0.2.2:5000/api/orders"; // local API
-
   Future<OrderResponse> placeOrder(OrderRequest request) async {
     final url = Uri.parse("$baseurl/Orders/PlaceOrder");
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/complaint_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
+import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
 class CustomerOrderDetails extends StatefulWidget {
   final int orderid;
@@ -29,10 +31,30 @@ class CustomerOrderDetails extends StatefulWidget {
   State<CustomerOrderDetails> createState() => _OrderDetailsState();
 }
 
+int selectedIndex = 0;
+
 class _OrderDetailsState extends State<CustomerOrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: CustomBottomNavbar(
+        currentindex: selectedIndex,
+        ontap: (int index) {
+          setState(() {
+            selectedIndex = index;
+          });
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => ShowVendorScreen(customer: widget.customer),
+              ),
+            );
+          }
+        },
+      ),
+
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Text(
@@ -125,7 +147,7 @@ class _OrderDetailsState extends State<CustomerOrderDetails> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
 
             SizedBox(height: 20),
 

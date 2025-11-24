@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/current_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   final String buyerId;
@@ -203,16 +206,71 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               children:
                   isPast
                       ? [
-                        _orderButton("VIEW ORDER", Colors.orange, Colors.white),
                         _orderButton(
-                          "REPEAT ORDER",
+                          "VIEW ORDER",
+                          Colors.orange,
+                          Colors.white,
+                          onPressed: () {
+                            // VIEW ORDER action (currently do nothing)
+                          },
+                        ),
+                        _orderButton(
+                          "Want To Rate",
                           Colors.white,
                           Colors.orange,
+                          onPressed: () {
+                            // Navigate to the rating screen
+                            showDialog(
+                              context: context,
+                              barrierColor:
+                                  Colors.black38, // semi-transparent background
+                              builder:
+                                  (context) =>
+                                      RatingScreen(orderId: order.orderId),
+                            );
+                          },
                         ),
                       ]
                       : [
-                        _orderButton("CANCEL ORDER", Colors.white, Colors.red),
-                        _orderButton("TRACK ORDER", Colors.white, Colors.green),
+                        _orderButton(
+                          "CANCEL ORDER",
+                          Colors.white,
+                          Colors.red,
+                          onPressed: () async {
+                            final cancelController = CancelOrderController();
+
+                            final result = await cancelController.cancelOrder(
+                              CancelOrderRequest(orderId: order.orderId),
+                            );
+
+                            if (result != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Order canceled successfully"),
+                                ),
+                              );
+
+                              // Remove from list instantly without refresh
+                              setState(() {
+                                currentOrders.remove(order);
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Failed to cancel order"),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        _orderButton(
+                          "TRACK ORDER",
+                          Colors.white,
+                          Colors.green,
+                          onPressed: () {
+                            // TRACK ORDER action (currently do nothing)
+                          },
+                        ),
                       ],
             ),
           ],
@@ -263,12 +321,17 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  Widget _orderButton(String title, Color bgColor, Color borderColor) {
+  Widget _orderButton(
+    String title,
+    Color bgColor,
+    Color borderColor, {
+    VoidCallback? onPressed,
+  }) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: onPressed, // <-- FIXED
           style: ElevatedButton.styleFrom(
             backgroundColor: bgColor,
             foregroundColor: borderColor,

@@ -1,7 +1,6 @@
-// views/screens/suppliers_screens/supplier_orders_screen.dart
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/supplier_order_controller.dart';
-import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
+import 'package:lpg_booking_system/models/suppliers_models/getsupplier_order_response.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_order_details_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
@@ -15,12 +14,13 @@ class SupplierOrdersScreen extends StatefulWidget {
 
 class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
   int selectedIndex = 0;
-  late Future<List<Order>> futureOrders;
+  late Future<List<SupplierOrder>> futureOrders;
 
   @override
   void initState() {
     super.initState();
-    futureOrders = GetOrderService.getSupplierOrders(widget.supplierId);
+    // Fetch orders from API
+    futureOrders = OrderService.getSupplierOrders(widget.supplierId);
   }
 
   @override
@@ -42,7 +42,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
         backgroundColor: Colors.orange,
         centerTitle: true,
       ),
-      body: FutureBuilder<List<Order>>(
+      body: FutureBuilder<List<SupplierOrder>>(
         future: futureOrders,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,7 +57,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
           return ListView.builder(
             itemCount: orders.length,
             itemBuilder: (context, index) {
-              final order = orders[index];
+              final order = orders[index]; // Each SupplierOrder object
               return buildOrderCard(order);
             },
           );
@@ -66,7 +66,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
     );
   }
 
-  Widget buildOrderCard(Order order) {
+  Widget buildOrderCard(SupplierOrder order) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -84,8 +84,9 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
-            Text("Customer: ${order.buyerName}"),
-            Text(order.buyerCity),
+            Text("Vendor: ${order.vendorName}"),
+            Text("Vendor City: ${order.vendorCity}"),
+            Text("Delivery City: ${order.city}"),
             Text("Status: ${order.status}"),
             const SizedBox(height: 12),
             Align(
@@ -105,7 +106,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
                     MaterialPageRoute(
                       builder:
                           (context) => SupplierOrderDetailScreen(
-                            order: order, // 👈 pass the selected order
+                            order: order, // pass the current order
                             supplierId: widget.supplierId,
                           ),
                     ),

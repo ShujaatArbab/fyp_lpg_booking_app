@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/accept_order_controller.dart';
-import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
+import 'package:lpg_booking_system/models/suppliers_models/getsupplier_order_response.dart';
 
 class SupplierOrderDetailScreen extends StatefulWidget {
-  final Order order;
+  final SupplierOrder order;
   final String supplierId;
 
   const SupplierOrderDetailScreen({
@@ -126,7 +126,7 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text("Vendor Name: ${widget.order.buyerName}"),
+                    Text("Vendor Name: ${widget.order.vendorName}"),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,7 +141,7 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
                                 fontSize: 14,
                               ),
                             ),
-                            Text(widget.order.buyerCity),
+                            Text(widget.order.vendorCity),
                           ],
                         ),
                         Column(
@@ -154,15 +154,14 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
                                 fontSize: 14,
                               ),
                             ),
-                            Text(widget.order.buyerPhone),
+                            Text(widget.order.vendorPhone),
                           ],
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text("Status: ${widget.order.status}"),
-                    Text("Order Date: ${widget.order.orderDate}"),
-                    Text("Delivery Date: ${widget.order.deliveryDate}"),
+                    Text("Order Date: ${widget.order.oDate}"),
                   ],
                 ),
               ),

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:lpg_booking_system/controllers/customer_controller/complaint_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/complaint_reponse.dart';
 import 'package:lpg_booking_system/models/customers_models/complaint_request.dart';
@@ -99,7 +97,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                   'Complaint By: ',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text('${widget.customer.name}'),
+                Text(widget.customer.name),
               ],
             ),
           ),
