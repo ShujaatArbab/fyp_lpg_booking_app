@@ -34,7 +34,7 @@ class SupplierOrder {
               ? DateTime.parse(json['delivery_date'])
               : null,
       status: json['status'],
-      city: json['City'],
+      city: json['City'] ?? '',
       items:
           (json['Items'] as List)
               .map((itemJson) => Item.fromJson(itemJson))

@@ -3,12 +3,14 @@ class AccessoriesResponse {
   final String userId;
   final int cylinderId;
   final String usagePurpose;
+  final String quantity;
 
   AccessoriesResponse({
     required this.message,
     required this.userId,
     required this.cylinderId,
     required this.usagePurpose,
+    required this.quantity,
   });
 
   //! Convert JSON to Dart object
@@ -18,6 +20,7 @@ class AccessoriesResponse {
       userId: json['UserId'],
       cylinderId: json['CylinderId'],
       usagePurpose: json['UsagePurpose'],
+      quantity: json['Quantity'],
     );
   }
 }

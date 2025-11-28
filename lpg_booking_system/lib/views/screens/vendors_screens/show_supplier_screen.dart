@@ -3,22 +3,24 @@ import 'package:lpg_booking_system/controllers/vendor_controller/show_suppliers_
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_response.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/add_deliveryperson_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/add_shop_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_place_order_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
-class Vendordashboard extends StatefulWidget {
+class Showsupplierscreen extends StatefulWidget {
   final LoginResponse vendor;
-  const Vendordashboard({super.key, required this.vendor});
+  const Showsupplierscreen({super.key, required this.vendor});
 
   @override
-  State<Vendordashboard> createState() => _VendordashboardState();
+  State<Showsupplierscreen> createState() => _ShowsupplierscreenState();
 }
 
-class _VendordashboardState extends State<Vendordashboard> {
+class _ShowsupplierscreenState extends State<Showsupplierscreen> {
   int selectedIndex = 0;
   bool isLoading = true;
   List<SupplierResponse> supplierList = [];
@@ -57,13 +59,32 @@ class _VendordashboardState extends State<Vendordashboard> {
           setState(() {
             selectedIndex = index;
           });
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => VendorDashboardScreen(vendor: widget.vendor),
+              ),
+            );
+          }
+          if (index == 1) {
+            return;
+          }
 
           if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) => OrdersScreen(vendorId: widget.vendor.userid),
+                builder: (context) => OrdersScreen(vendorId: widget.vendor),
+              ),
+            );
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.vendor),
               ),
             );
           }

@@ -6,8 +6,9 @@ import 'package:lpg_booking_system/models/customers_models/showvendor_response.d
 import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/placeorder_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
+import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class ShowVendorScreen extends StatefulWidget {
   final LoginResponse customer;
@@ -70,19 +71,31 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       //! bottom navbar
-      bottomNavigationBar: CustomBottomNavbar(
+      bottomNavigationBar: CustomerNavbar(
         currentindex: selectedIndex,
         ontap: (int index) {
           setState(() {
             selectedIndex = index;
           });
-          if (index == 2) {
+          if (index == 0) {
+            return;
+          }
+
+          if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
                     (context) =>
                         MyOrdersScreen(buyerId: widget.customer.userid),
+              ),
+            );
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.customer),
               ),
             );
           }

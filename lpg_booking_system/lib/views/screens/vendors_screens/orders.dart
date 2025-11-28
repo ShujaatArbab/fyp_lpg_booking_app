@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/vendororders_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/show_supplier_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/view_order_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final String vendorId;
+  final LoginResponse vendorId;
   const OrdersScreen({super.key, required this.vendorId});
 
   @override
@@ -19,7 +23,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   void initState() {
     super.initState();
-    futureOrders = OrderService.getVendorOrders(widget.vendorId);
+    futureOrders = OrderService.getVendorOrders(widget.vendorId.userid);
   }
 
   @override
@@ -27,7 +31,37 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Scaffold(
       bottomNavigationBar: CustomBottomNavbar(
         currentindex: selectedIndex,
-        ontap: (int index) {},
+        ontap: (int index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => VendorDashboardScreen(vendor: widget.vendorId),
+              ),
+            );
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => Showsupplierscreen(vendor: widget.vendorId),
+              ),
+            );
+          }
+          if (index == 2) {
+            return;
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.vendorId),
+              ),
+            );
+          }
+        },
       ),
 
       appBar: AppBar(
@@ -102,7 +136,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       builder:
                           (context) => OrderDetailScreen(
                             order: order,
-                            vendorId: widget.vendorId,
+                            vendorId: widget.vendorId.userid,
                           ),
                     ),
                   );

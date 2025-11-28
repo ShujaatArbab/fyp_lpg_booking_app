@@ -3,7 +3,7 @@ import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 
 class AccessoriesScreen extends StatefulWidget {
   final String cylindersize;
-  final LoginResponse response; // Logged-in user ID
+  final LoginResponse response;
 
   const AccessoriesScreen({
     super.key,
@@ -15,18 +15,28 @@ class AccessoriesScreen extends StatefulWidget {
   State<AccessoriesScreen> createState() => _AccessoriesScreenState();
 }
 
-Map<String, bool> accessories = {
-  'Cooking / Stove': false,
-  'Heating / Water Heater': false,
-  'Backup / Emergency Cylinder': false,
-  'Outdoor Cooking / BBQ': false,
-  'Gas Oven / Baking': false,
-};
-
 class _AccessoriesScreenState extends State<AccessoriesScreen> {
+  // Accessories with selection and quantity
+  Map<String, bool> accessorySelected = {
+    'Cooking / Stove': false,
+    'Heating / Water Heater': false,
+    'Backup / Emergency Cylinder': false,
+    'Outdoor Cooking / BBQ': false,
+    'Gas Oven / Baking': false,
+  };
+
+  Map<String, int> accessoryQuantity = {
+    'Cooking / Stove': 0,
+    'Heating / Water Heater': 0,
+    'Backup / Emergency Cylinder': 0,
+    'Outdoor Cooking / BBQ': 0,
+    'Gas Oven / Baking': 0,
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
         title: const Text(
           'Accessories',
@@ -37,71 +47,137 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
       ),
       body: Column(
         children: [
+          const SizedBox(height: 15),
           Padding(
-            padding: const EdgeInsets.only(top: 20, left: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              'For which purpose you are ordering ${widget.cylindersize} cylinder',
+              "For which purpose you are ordering ${widget.cylindersize} cylinder?",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 10),
-          const Align(
-            alignment: Alignment.center,
-            child: Text(
-              'Select Purpose',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          const Text(
+            "Select purpose & quantity",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 15),
+          Expanded(
+            child: ListView(
+              children:
+                  accessorySelected.keys.map((key) {
+                    return Card(
+                      color: Colors.white,
+                      elevation: 3,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.orange, width: 2),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Column(
+                          children: [
+                            CheckboxListTile(
+                              value: accessorySelected[key],
+                              onChanged: (value) {
+                                setState(() {
+                                  accessorySelected[key] = value!;
+                                  if (!value) accessoryQuantity[key] = 0;
+                                });
+                              },
+                              title: Text(
+                                key,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              activeColor: Colors.orange,
+                            ),
+                            if (accessorySelected[key] == true)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                        size: 28,
+                                      ),
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        setState(() {
+                                          if (accessoryQuantity[key]! > 0) {
+                                            accessoryQuantity[key] =
+                                                accessoryQuantity[key]! - 1;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Text(
+                                      accessoryQuantity[key].toString(),
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.add_circle_outline,
+                                        size: 28,
+                                      ),
+                                      color: Colors.green,
+                                      onPressed: () {
+                                        setState(() {
+                                          accessoryQuantity[key] =
+                                              accessoryQuantity[key]! + 1;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
             ),
           ),
-          const SizedBox(height: 20),
-          Column(
-            children:
-                accessories.keys.map((key) {
-                  return Row(
-                    children: [
-                      Checkbox(
-                        value: accessories[key],
-                        onChanged: (bool? value) {
-                          setState(() {
-                            accessories[key] = value!;
-                          });
-                        },
-                      ),
-                      Text(key),
-                      const SizedBox(width: 10),
-                    ],
+          Container(
+            padding: const EdgeInsets.only(bottom: 15),
+            child: ElevatedButton(
+              onPressed: () {
+                Map<String, int> selected = {};
+                accessorySelected.forEach((key, isChecked) {
+                  if (isChecked && accessoryQuantity[key]! > 0) {
+                    selected[key] = accessoryQuantity[key]!;
+                  }
+                });
+
+                if (selected.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Please select at least one purpose."),
+                    ),
                   );
-                }).toList(),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              // Collect selected purposes
-              List<String> selectedPurposes =
-                  accessories.entries
-                      .where((entry) => entry.value)
-                      .map((entry) => entry.key)
-                      .toList();
+                  return;
+                }
 
-              if (selectedPurposes.isEmpty) {
-                // Show error if nothing selected
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please select at least one purpose.'),
-                  ),
-                );
-                return;
-              }
-
-              // Return selected purposes to previous screen
-              Navigator.pop(context, selectedPurposes);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text(
-              'Select',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                Navigator.pop(context, selected); // Returns Map<String,int>
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              child: const Text(
+                "Select",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

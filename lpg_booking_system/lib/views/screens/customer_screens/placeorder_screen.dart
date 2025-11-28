@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/accessories_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/orderconfirm_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
+import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class PlaceorderScreen extends StatefulWidget {
   final int smallQty;
@@ -39,7 +42,6 @@ class PlaceorderScreen extends StatefulWidget {
 class _PlaceorderScreenState extends State<PlaceorderScreen> {
   final List<String> tanksize = ['11kg', '15kg', '45kg'];
   String? selectedsize;
-  int selectedIndex = 0;
   int quantity = 1;
   List<TankItem> selecteditem = [];
 
@@ -49,31 +51,43 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
     '45kg': 11160,
   };
 
-  void increment() {
-    setState(() {
-      quantity++;
-    });
-  }
-
+  void increment() => setState(() => quantity++);
   void decrement() {
-    if (quantity > 1) {
-      setState(() {
-        quantity--;
-      });
-    }
+    if (quantity > 1) setState(() => quantity--);
   }
 
   void deletecard(int index) {
-    setState(() {
-      selecteditem.removeAt(index);
-    });
+    setState(() => selecteditem.removeAt(index));
   }
 
-  // Add cylinder after selecting accessories
-  Future<void> addCylinderWithPurposes(
-    String size,
-    List<String> selectedPurposes,
-  ) async {
+  Future<void> onTankClick(String size) async {
+    setState(() {
+      selectedsize = size;
+    });
+
+    // Navigate to AccessoriesScreen
+    final selectedAccessories = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => AccessoriesScreen(
+              cylindersize: size,
+              response: widget.customer,
+            ),
+      ),
+    );
+
+    if (selectedAccessories == null ||
+        (selectedAccessories as Map<String, int>).isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No purposes selected.')));
+      return;
+    }
+
+    final accessoriesMap = selectedAccessories as Map<String, int>;
+
+    // Determine available quantity
     int availableQty = 0;
     if (size == '11kg') availableQty = widget.smallQty;
     if (size == '15kg') availableQty = widget.mediumQty;
@@ -87,7 +101,6 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
     }
 
     final existingIndex = selecteditem.indexWhere((item) => item.size == size);
-
     if (existingIndex != -1) {
       final currentQty = selecteditem[existingIndex].quantity;
       if (currentQty + quantity > availableQty) {
@@ -100,7 +113,8 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
       }
       setState(() {
         selecteditem[existingIndex].quantity += quantity;
-        selecteditem[existingIndex].accessories = selectedPurposes;
+        selecteditem[existingIndex].accessories =
+            accessoriesMap.entries.map((e) => "${e.key} x${e.value}").toList();
       });
     } else {
       setState(() {
@@ -109,63 +123,52 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
             size: size,
             price: tankprices[size]!,
             quantity: quantity,
-            accessories: selectedPurposes,
+            accessories:
+                accessoriesMap.entries
+                    .map((e) => "${e.key} x${e.value}")
+                    .toList(),
           ),
         );
       });
     }
 
-    // Reset selection
+    // Reset quantity and selection
     setState(() {
       selectedsize = null;
       quantity = 1;
     });
   }
 
-  Future<void> onTankClick(String size) async {
-    setState(() {
-      selectedsize = size;
-    });
-
-    // Navigate to AccessoriesScreen
-    final selectedPurposes = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => AccessoriesScreen(
-              cylindersize: size,
-              response: widget.customer,
-            ),
-      ),
-    );
-
-    if (selectedPurposes == null ||
-        (selectedPurposes as List<String>).isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No purposes selected.')));
-      return;
-    }
-
-    // Add cylinder with selected purposes
-    await addCylinderWithPurposes(size, selectedPurposes);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: CustomBottomNavbar(
-        currentindex: selectedIndex,
+      bottomNavigationBar: CustomerNavbar(
+        currentindex: 0,
         ontap: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
-          if (index == 1) {
-            Navigator.pushReplacement(
+          if (index == 0) {
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
                     (context) => ShowVendorScreen(customer: widget.customer),
+              ),
+            );
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        MyOrdersScreen(buyerId: widget.customer.userid),
+              ),
+            );
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.customer),
               ),
             );
           }
@@ -179,18 +182,19 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
         centerTitle: true,
         backgroundColor: Colors.orange,
       ),
-      body: Container(
-        margin: const EdgeInsets.only(top: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //! Vendor Info
+              // Vendor Info at top
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.orange, width: 2),
                   borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,86 +208,18 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
               ),
               const SizedBox(height: 20),
 
-              //! Tank Selection
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Tank Size:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
+              // Cylinder Quantity Selector
+              const Text(
+                'Select Cylinder Quantity:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 12,
-                runSpacing: 10,
-                children:
-                    tanksize.map((size) {
-                      int available = 0;
-                      if (size == '11kg') available = widget.smallQty;
-                      if (size == '15kg') available = widget.mediumQty;
-                      if (size == '45kg') available = widget.largeQty;
-
-                      final bool isSelected = selectedsize == size;
-
-                      return ElevatedButton(
-                        onPressed:
-                            available > 0 ? () => onTankClick(size) : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              isSelected ? Colors.orange : Colors.white,
-                          side: const BorderSide(
-                            color: Colors.orange,
-                            width: 2,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              size,
-                              style: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'Rs ${tankprices[size]}',
-                              style: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black,
-                              ),
-                            ),
-                            Text(
-                              'Stock: $available',
-                              style: TextStyle(
-                                color:
-                                    isSelected ? Colors.white : Colors.black54,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-              ),
-
-              const SizedBox(height: 20),
-
-              //! Quantity Section
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Quantity:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-              ),
-              const SizedBox(height: 10),
-
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
                     width: 120,
-                    height: 55,
+                    height: 50,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.orange, width: 2),
                       borderRadius: BorderRadius.circular(10),
@@ -298,8 +234,8 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                         Text(
                           quantity.toString(),
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
                             fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         IconButton(
@@ -311,69 +247,148 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
 
-              //! Order List
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Your Order:",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
+              // Tank Selection Buttons
+              const Text(
+                'Select Cylinder:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               const SizedBox(height: 10),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children:
+                    tanksize.map((size) {
+                      int available =
+                          (size == '11kg')
+                              ? widget.smallQty
+                              : (size == '15kg')
+                              ? widget.mediumQty
+                              : widget.largeQty;
 
-              SizedBox(
-                height: 200,
-                child:
-                    selecteditem.isEmpty
-                        ? const Center(child: Text("No cylinders added yet."))
-                        : ListView.builder(
-                          itemCount: selecteditem.length,
-                          itemBuilder: (context, index) {
-                            final cylinder = selecteditem[index];
-                            return CustomCylinderCard(
-                              size: cylinder.size,
-                              price: cylinder.price,
-                              quantity: cylinder.quantity,
-                              onDelete: () => deletecard(index),
-                              extraWidget: null,
-                            );
-                          },
+                      return ElevatedButton(
+                        onPressed:
+                            available > 0 ? () => onTankClick(size) : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              selectedsize == size
+                                  ? Colors.orange
+                                  : Colors.white,
+                          side: const BorderSide(
+                            color: Colors.orange,
+                            width: 2,
+                          ),
                         ),
+                        child: Column(
+                          children: [
+                            Text(
+                              size,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    selectedsize == size
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
+                            ),
+                            Text(
+                              'Rs ${tankprices[size]}',
+                              style: TextStyle(
+                                color:
+                                    selectedsize == size
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
+                            ),
+                            Text(
+                              'Stock: $available',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    selectedsize == size
+                                        ? Colors.white
+                                        : Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
               ),
               const SizedBox(height: 20),
 
-              //! Proceed Button
-              CustomButton(
-                text: 'Proceed',
-                onpressed: () {
-                  if (selecteditem.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please add at least one cylinder.'),
+              // Selected Cylinders List
+              const Text(
+                "Your Order:",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              const SizedBox(height: 10),
+              selecteditem.isEmpty
+                  ? const Text("No cylinders added yet.")
+                  : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: selecteditem.length,
+                    itemBuilder: (context, index) {
+                      final cylinder = selecteditem[index];
+                      return CustomCylinderCard(
+                        size: cylinder.size,
+                        price: cylinder.price,
+                        quantity: cylinder.quantity,
+                        onDelete: () => deletecard(index),
+                        extraWidget:
+                            cylinder.accessories != null
+                                ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:
+                                      cylinder.accessories!
+                                          .map(
+                                            (acc) => Text(
+                                              acc,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                )
+                                : null,
+                      );
+                    },
+                  ),
+              const SizedBox(height: 20),
+
+              // Proceed Button
+              Center(
+                child: CustomButton(
+                  text: 'Proceed',
+                  onpressed: () {
+                    if (selecteditem.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please add at least one cylinder.'),
+                        ),
+                      );
+                      return;
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => OrderconfirmationScreen(
+                              selecteditem: selecteditem,
+                              vendorName: widget.vendorName,
+                              vendorPhone: widget.vendorPhone,
+                              vendorAddress: widget.vendorAddress,
+                              vendorcity: widget.vendorcity,
+                              customer: widget.customer,
+                              vendorId: widget.vendorId,
+                            ),
                       ),
                     );
-                    return;
-                  }
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => OrderconfirmationScreen(
-                            selecteditem: selecteditem,
-                            vendorName: widget.vendorName,
-                            vendorPhone: widget.vendorPhone,
-                            vendorAddress: widget.vendorAddress,
-                            vendorcity: widget.vendorcity,
-                            customer: widget.customer,
-                            vendorId: widget.vendorId,
-                          ),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
             ],
           ),

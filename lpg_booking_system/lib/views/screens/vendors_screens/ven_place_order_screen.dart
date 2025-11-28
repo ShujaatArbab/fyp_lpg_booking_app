@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_orderconfirm_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
@@ -124,9 +127,34 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
       bottomNavigationBar: CustomBottomNavbar(
         currentindex: selectedIndex,
         ontap: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => VendorDashboardScreen(vendor: widget.vendor),
+              ),
+            );
+          }
+          if (index == 1) {
+            return;
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OrdersScreen(vendorId: widget.vendor),
+              ),
+            );
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.vendor),
+              ),
+            );
+          }
         },
       ),
       appBar: AppBar(

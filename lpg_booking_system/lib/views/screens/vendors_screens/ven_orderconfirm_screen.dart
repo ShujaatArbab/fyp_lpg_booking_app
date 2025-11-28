@@ -5,7 +5,7 @@ import 'package:lpg_booking_system/controllers/vendor_controller/place_order_con
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/place_order_request.dart';
-import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/final_vendor_order_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
 
 class VendorOrderConfirmationScreen extends StatefulWidget {
@@ -113,7 +113,7 @@ class _VendorOrderConfirmationScreenState
         context: context,
         barrierDismissible: false,
         builder:
-            (_) => FinalorderconfirmScreen(
+            (_) => FinalVendororderconfirmScreen(
               orderid: orderId,
               selecteditem: widget.selectedItems,
               vendorName: widget.supplierName,

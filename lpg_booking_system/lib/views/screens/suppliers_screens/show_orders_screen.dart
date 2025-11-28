@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/supplier_order_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/suppliers_models/getsupplier_order_response.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_order_details_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_dashboard_screen.dart';
+import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class SupplierOrdersScreen extends StatefulWidget {
-  final String supplierId;
+  final LoginResponse supplierId;
   const SupplierOrdersScreen({super.key, required this.supplierId});
 
   @override
@@ -20,17 +23,38 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
   void initState() {
     super.initState();
     // Fetch orders from API
-    futureOrders = OrderService.getSupplierOrders(widget.supplierId);
+    futureOrders = OrderService.getSupplierOrders(widget.supplierId.userid);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: CustomBottomNavbar(
+      bottomNavigationBar: CustomerNavbar(
         currentindex: selectedIndex,
         ontap: (int index) {
           setState(() {
-            selectedIndex = index;
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                          SupplierdashboardScreen(supplier: widget.supplierId),
+                ),
+              );
+            }
+            if (index == 1) {
+              return;
+            }
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => ProfileScreen(profile: widget.supplierId),
+                ),
+              );
+            }
           });
         },
       ),
@@ -107,7 +131,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
                       builder:
                           (context) => SupplierOrderDetailScreen(
                             order: order, // pass the current order
-                            supplierId: widget.supplierId,
+                            supplierId: widget.supplierId.userid,
                           ),
                     ),
                   );

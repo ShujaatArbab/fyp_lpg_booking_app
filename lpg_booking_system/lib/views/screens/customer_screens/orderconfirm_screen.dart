@@ -62,18 +62,26 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     if (item.accessories == null || item.accessories!.isEmpty) return;
 
     final controller = AccessoriesController();
-    final request = AccessoriesRequest(
-      userId: widget.customer.userid,
-      cylinderId: getCylinderId(item.size),
-      usagePurpose: item.accessories!.join(', '),
-    );
 
-    try {
-      await controller.placeAccessoriesOrder(request);
-      // Optional: show success message
-    } catch (e) {
-      print("Accessories API failed: $e");
-      // Optional: show error snackbar
+    for (var acc in item.accessories!) {
+      // acc format: "Cooking / Stove x2"
+      var parts = acc.split(' x');
+      var purpose = parts[0].trim();
+      var quantity = int.tryParse(parts[1].trim()) ?? 1;
+
+      final request = AccessoriesRequest(
+        userId: widget.customer.userid,
+        cylinderId: getCylinderId(item.size),
+        usagePurpose: purpose,
+        quantity:
+            quantity, // API might still expect string, backend converts to int
+      );
+
+      try {
+        await controller.placeAccessoriesOrder(request);
+      } catch (e) {
+        print("Accessories API failed for $purpose: $e");
+      }
     }
   }
 
@@ -107,7 +115,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     final sellerId = widget.vendorId;
 
     try {
-      // First, call Accessories API for each cylinder if accessories exist
+      // First, place accessories API for each cylinder
       for (var item in widget.selecteditem) {
         await placeAccessories(item);
       }
@@ -130,7 +138,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
       final response = await OrderController().placeOrder(request);
       final orderId = response.orderId;
 
-      // Navigate to final confirmation
+      // Navigate to final confirmation screen
       showDialog(
         context: context,
         barrierColor: Colors.black.withOpacity(0.5),
@@ -227,7 +235,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
           ),
           const SizedBox(height: 10),
 
-          // List of selected cylinders
+          // List of selected cylinders with accessories
           Expanded(
             child:
                 widget.selecteditem.isEmpty
@@ -241,7 +249,24 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                           price: cylinder.price,
                           quantity: cylinder.quantity,
                           onDelete: () => deleteCylinder(index),
-                          extraWidget: null,
+                          extraWidget:
+                              cylinder.accessories != null
+                                  ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children:
+                                        cylinder.accessories!
+                                            .map(
+                                              (acc) => Text(
+                                                acc,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                  )
+                                  : null,
                         );
                       },
                     ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/rating_controller.dart';
 
 import 'package:lpg_booking_system/models/customers_models/rating_request.dart';
-import 'package:lpg_booking_system/models/customers_models/rating_response.dart';
 
 class RatingScreen extends StatefulWidget {
   final int orderId;

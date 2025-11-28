@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_button.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final LoginResponse profile;
+  const ProfileScreen({super.key, required this.profile});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -36,22 +37,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       Column(
-                        children: [ListTile(leading: CircleAvatar(radius: 25))],
-                      ),
-                      Column(
                         children: [
-                          Text(
-                            'Shujaat',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                          Padding(
+                            padding: const EdgeInsets.only(left: 40.0, top: 30),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Name : ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+
+                                Text(
+                                  widget.profile.name,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            'shujaat11@gmail.com',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 40.0, top: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Email : ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                Text(
+                                  widget.profile.email,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -206,15 +228,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           //!  sign out button
-          SizedBox(height: 10),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CustomButton(
-                text: 'Sign Out',
-                onpressed: () {
-                  LoginScreen();
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
                 },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                child: Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
