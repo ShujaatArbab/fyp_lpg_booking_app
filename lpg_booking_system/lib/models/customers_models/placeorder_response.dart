@@ -18,7 +18,7 @@ class OrderResponse {
   final String buyer;
   final String seller;
   final String orderDate;
-  final String deliveryDate;
+  final String? deliveryDate;
   final double latitude;
   final double longitude;
   final String status;
@@ -30,7 +30,7 @@ class OrderResponse {
     required this.buyer,
     required this.seller,
     required this.orderDate,
-    required this.deliveryDate,
+    this.deliveryDate,
     required this.latitude,
     required this.longitude,
     required this.status,
@@ -44,7 +44,7 @@ class OrderResponse {
       buyer: json['Buyer'],
       seller: json['Seller'],
       orderDate: json['OrderDate'],
-      deliveryDate: json['DeliveryDate'],
+      deliveryDate: json['DeliveryDate']?.toString(),
       latitude: (json['Latitude'] as num).toDouble(),
       longitude: (json['Longitude'] as num).toDouble(),
       status: json['Status'],

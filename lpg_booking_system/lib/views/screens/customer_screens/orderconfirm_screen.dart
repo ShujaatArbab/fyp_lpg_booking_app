@@ -9,6 +9,7 @@ import 'package:lpg_booking_system/models/customers_models/placeorder_request.da
 import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
+import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class OrderconfirmationScreen extends StatefulWidget {
   final List<TankItem> selecteditem;
@@ -175,7 +176,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: CustomBottomNavbar(
+      bottomNavigationBar: CustomerNavbar(
         currentindex: 0,
         ontap: (int index) {
           setState(() {});

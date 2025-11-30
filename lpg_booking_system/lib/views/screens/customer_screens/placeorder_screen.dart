@@ -6,7 +6,6 @@ import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_scre
 import 'package:lpg_booking_system/views/screens/customer_screens/orderconfirm_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
 import 'package:lpg_booking_system/views/screens/profile_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';

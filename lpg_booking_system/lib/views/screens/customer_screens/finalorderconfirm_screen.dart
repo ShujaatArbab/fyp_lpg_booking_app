@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 import 'dart:ui';
-
-import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 
 class FinalorderconfirmScreen extends StatefulWidget {
   final int orderid;
@@ -107,15 +106,8 @@ class _FinalorderconfirmScreenState extends State<FinalorderconfirmScreen> {
                             context,
                             MaterialPageRoute(
                               builder:
-                                  (context) => CustomerOrderDetails(
-                                    orderid: widget.orderid,
-                                    selecteditem: widget.selecteditem,
-                                    vendorName: widget.vendorName,
-                                    vendorAddress: widget.vendorAddress,
-                                    vendorPhone: widget.vendorPhone,
-                                    vendorCity: widget.vendorCity,
-                                    customer: widget.customer,
-                                    vendorId: widget.vendorId,
+                                  (context) => MyOrdersScreen(
+                                    buyerId: widget.customer.userid,
                                   ),
                             ),
                           );

@@ -4,6 +4,7 @@ import 'package:lpg_booking_system/controllers/customer_controller/current_order
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
@@ -17,8 +18,8 @@ class MyOrdersScreen extends StatefulWidget {
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   int selectedTab = 0; // 0 = current, 1 = past
   bool isLoading = true;
-  List<CustomerOrder> currentOrders = [];
-  List<CustomerOrder> pastOrders = [];
+  List<CustomerOrders> currentOrders = [];
+  List<CustomerOrders> pastOrders = [];
 
   final currentController = CustomerOrdersController();
   final pastController = CustomerPastOrdersController();
@@ -122,7 +123,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  Widget _buildOrderList(List<CustomerOrder> orders, {required bool isPast}) {
+  Widget _buildOrderList(List<CustomerOrders> orders, {required bool isPast}) {
     if (orders.isEmpty) {
       return const Center(
         child: Text(
@@ -142,7 +143,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  Widget _buildOrderCard(CustomerOrder order, {required bool isPast}) {
+  Widget _buildOrderCard(CustomerOrders order, {required bool isPast}) {
     String cylinderList = order.items
         .map((item) => item.cylinderType)
         .toSet()
@@ -210,9 +211,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           "VIEW ORDER",
                           Colors.orange,
                           Colors.white,
-                          onPressed: () {
-                            // VIEW ORDER action (currently do nothing)
-                          },
+                          onPressed: () {},
                         ),
                         _orderButton(
                           "Want To Rate",

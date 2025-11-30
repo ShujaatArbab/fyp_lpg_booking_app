@@ -13,52 +13,51 @@ class CustomerOrderItem {
 
   factory CustomerOrderItem.fromJson(Map<String, dynamic> json) {
     return CustomerOrderItem(
-      oiId: json['OI_id'],
-      quantity: json['quantity'],
-      cyId: json['cy_id'],
-      cylinderType: json['CylinderType'],
+      oiId: json['OI_id'] ?? 0,
+      quantity: json['quantity'] ?? 0,
+      cyId: json['cy_id'] ?? 0,
+      cylinderType: json['CylinderType'] ?? '',
     );
   }
 }
 
-class CustomerOrder {
+class CustomerOrders {
   final int orderId;
   final String buyerName;
   final String sellerName;
-  final String status;
-  final String city;
-  final String? oDate;
+  final DateTime oDate;
   final String? deliveryDate;
-  final int? price;
+  final String status;
+  final String? city;
+  final dynamic price;
   final List<CustomerOrderItem> items;
 
-  CustomerOrder({
+  CustomerOrders({
     required this.orderId,
     required this.buyerName,
     required this.sellerName,
-    required this.status,
-    required this.city,
-    this.oDate,
+    required this.oDate,
     this.deliveryDate,
+    required this.status,
+    this.city,
     this.price,
     required this.items,
   });
 
-  factory CustomerOrder.fromJson(Map<String, dynamic> json) {
-    var list = (json['Items'] as List?) ?? [];
-    List<CustomerOrderItem> items =
-        list.map((i) => CustomerOrderItem.fromJson(i)).toList();
-
-    return CustomerOrder(
+  factory CustomerOrders.fromJson(Map<String, dynamic> json) {
+    return CustomerOrders(
       orderId: json['Order_id'],
       buyerName: json['BuyerName'],
       sellerName: json['SellerName'],
+      oDate: DateTime.parse(json['o_date']),
+      deliveryDate: json['delivery_date']?.toString(),
       status: json['status'],
       city: json['City'],
-      oDate: json['o_date'],
-      deliveryDate: json['delivery_date'],
       price: json['price'],
-      items: items,
+      items:
+          (json['Items'] as List<dynamic>)
+              .map((item) => CustomerOrderItem.fromJson(item))
+              .toList(),
     );
   }
 }
