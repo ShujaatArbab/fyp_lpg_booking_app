@@ -23,7 +23,9 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
   int selectedIndex = 0;
   int unreadCount = 0;
   List<VendorResponse> vendorList = [];
+  List<VendorResponse> filteredVendorList = [];
   bool isLoading = true;
+  double selectedRating = 0; // ⭐ selected rating for filter
 
   @override
   void initState() {
@@ -32,7 +34,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
     fetchUnreadNotifications();
   }
 
-  //! fetch unred notification
+  //! fetch unread notification
   Future<void> fetchUnreadNotifications() async {
     try {
       final count = await NotificationController().fetchUnreadCount(
@@ -56,15 +58,113 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
 
       setState(() {
         vendorList = response;
+        filteredVendorList = List.from(vendorList);
         isLoading = false; // ✅ stop loader
       });
     } catch (e) {
-      // ignore: avoid_print
       print('❌ Error: $e');
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  //! ⭐ show filter bottom sheet
+  void showRatingFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        double tempSelectedRating =
+            selectedRating; // local temp for bottom sheet
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return FractionallySizedBox(
+              heightFactor: 0.5,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Filter by Rating",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Select Rating:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: List.generate(5, (index) {
+                        int star = index + 1;
+                        return GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              tempSelectedRating = star.toDouble();
+                            });
+                          },
+                          child: Icon(
+                            Icons.star,
+                            size: 40,
+                            color:
+                                (tempSelectedRating >= star)
+                                    ? Colors.orange
+                                    : Colors.grey.shade300,
+                          ),
+                        );
+                      }),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          selectedRating = tempSelectedRating;
+                          // sort vendors by nearest rating
+                          filteredVendorList = List.from(vendorList);
+                          if (selectedRating > 0) {
+                            filteredVendorList.sort((a, b) {
+                              double diffA =
+                                  (a.averageRating - selectedRating).abs();
+                              double diffB =
+                                  (b.averageRating - selectedRating).abs();
+                              return diffA.compareTo(diffB);
+                            });
+                          }
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Apply Filter",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -77,17 +177,12 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
           setState(() {
             selectedIndex = index;
           });
-          if (index == 0) {
-            return;
-          }
-
+          if (index == 0) return;
           if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) =>
-                        MyOrdersScreen(buyerId: widget.customer.userid),
+                builder: (context) => MyOrdersScreen(buyerId: widget.customer),
               ),
             );
           }
@@ -104,7 +199,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
 
       body: Column(
         children: [
-          //! ✅ top header (overflow fixed)
+          //! top header
           Container(
             width: double.infinity,
             color: Colors.orangeAccent,
@@ -117,7 +212,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //! welcome text
                 const Row(
                   children: [
                     Text(
@@ -129,7 +223,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                     ),
                   ],
                 ),
-                //! name + notification icon
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -147,7 +240,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                         children: [
                           IconButton(
                             onPressed: () async {
-                              // 👇 Just open notifications screen — no API call yet
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -157,8 +249,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                       ),
                                 ),
                               );
-
-                              // 👇 After returning, refresh unread count
                               await fetchUnreadNotifications();
                             },
                             icon: const Icon(
@@ -167,8 +257,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                               size: 40,
                             ),
                           ),
-
-                          // 🔴 Badge
                           if (unreadCount > 0)
                             Positioned(
                               right: 6,
@@ -196,7 +284,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                     ),
                   ],
                 ),
-                //! userId
                 Row(
                   children: [
                     Text(
@@ -212,7 +299,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
             ),
           ),
 
-          //! region
+          //! region & filter
           Container(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: Row(
@@ -234,7 +321,7 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: showRatingFilterSheet, // ⭐ Added filter
                   icon: const Icon(
                     Icons.filter_alt,
                     color: Colors.orangeAccent,
@@ -243,39 +330,37 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
               ],
             ),
           ),
-          Center(
-            child: Container(
-              child: const Text(
-                "Vendors",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+          const Center(
+            child: Text(
+              "Vendors",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
           ),
-          //! card list
+
+          //! vendor card list
           Expanded(
             child:
                 isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                      // ✅ only vendors with shops will be shown
                       itemCount:
-                          vendorList.where((v) => v.shops.isNotEmpty).length,
+                          filteredVendorList
+                              .where((v) => v.shops.isNotEmpty)
+                              .length,
                       itemBuilder: (context, index) {
                         final vendorsWithShops =
-                            vendorList
+                            filteredVendorList
                                 .where((v) => v.shops.isNotEmpty)
                                 .toList();
                         final vendor = vendorsWithShops[index];
 
-                        // ✅ show all shops for this vendor
                         return Column(
                           children:
                               vendor.shops.map((shop) {
-                                // extract stock safely
                                 int smallQty =
                                     shop.stock
                                         .firstWhere(
@@ -319,7 +404,9 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                   title: vendor.name,
                                   location: 'Location: ${vendor.city}',
                                   phone: vendor.phone,
-                                  rating: '4.0',
+                                  rating: vendor.averageRating.toStringAsFixed(
+                                    1,
+                                  ),
                                   shopName: shop.shopName,
                                   shopCity: shop.city,
                                   smallQty: smallQty,
@@ -338,9 +425,8 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                                   "${shop.shopName}, ${shop.city}",
                                               vendorcity: vendor.city,
                                               customer: widget.customer,
-                                              smallQty: smallQty, // ✅ add this
-                                              mediumQty:
-                                                  mediumQty, // ✅ add this
+                                              smallQty: smallQty,
+                                              mediumQty: mediumQty,
                                               largeQty: largeQty,
                                             ),
                                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/notifications_controller.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/show_suppliers_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.dart';
@@ -9,6 +10,7 @@ import 'package:lpg_booking_system/views/screens/vendors_screens/add_shop_screen
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_place_order_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart'; // import notifications screen
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
@@ -24,11 +26,27 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
   int selectedIndex = 0;
   bool isLoading = true;
   List<SupplierResponse> supplierList = [];
+  int unreadCount = 0; // ⭐ unread notification count
 
   @override
   void initState() {
     super.initState();
     fetchSuppliers();
+    fetchUnreadNotifications();
+  }
+
+  //! fetch unread notifications for this vendor
+  Future<void> fetchUnreadNotifications() async {
+    try {
+      final count = await NotificationController().fetchUnreadCount(
+        widget.vendor.userid,
+      );
+      setState(() {
+        unreadCount = count;
+      });
+    } catch (e) {
+      print('❌ Error fetching unread count: $e');
+    }
   }
 
   //! fetch suppliers API
@@ -68,10 +86,7 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
               ),
             );
           }
-          if (index == 1) {
-            return;
-          }
-
+          if (index == 1) return;
           if (index == 2) {
             Navigator.push(
               context,
@@ -119,7 +134,61 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Icon(Icons.notifications_none, color: Colors.white),
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          SizedBox(
+                            height: 40, // ensure enough height
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.notifications_none,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                // open notifications screen
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => NotificationsScreen(
+                                          customer:
+                                              widget.vendor, // vendor as user
+                                        ),
+                                  ),
+                                );
+                                // refresh unread count after returning
+                                await fetchUnreadNotifications();
+                              },
+                            ),
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 22,
+                                height: 22,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  unreadCount.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 Text(

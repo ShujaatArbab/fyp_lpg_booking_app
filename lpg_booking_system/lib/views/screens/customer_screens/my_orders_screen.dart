@@ -3,12 +3,13 @@ import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_
 import 'package:lpg_booking_system/controllers/customer_controller/current_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
-  final String buyerId;
+  final LoginResponse buyerId;
   const MyOrdersScreen({super.key, required this.buyerId});
 
   @override
@@ -35,9 +36,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
     try {
       final current = await currentController.fetchCurrentOrders(
-        widget.buyerId,
+        widget.buyerId.userid,
       );
-      final past = await pastController.fetchPastOrders(widget.buyerId);
+      final past = await pastController.fetchPastOrders(widget.buyerId.userid);
       setState(() {
         currentOrders = current;
         pastOrders = past;
@@ -211,7 +212,18 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           "VIEW ORDER",
                           Colors.orange,
                           Colors.white,
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => CustomerOrderDetails(
+                                      orderId: order.orderId,
+                                      customer: widget.buyerId,
+                                    ),
+                              ),
+                            );
+                          },
                         ),
                         _orderButton(
                           "Want To Rate",

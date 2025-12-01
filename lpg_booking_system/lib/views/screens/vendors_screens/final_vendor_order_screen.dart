@@ -3,8 +3,6 @@ import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'dart:ui';
 
-import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
-
 class FinalVendororderconfirmScreen extends StatefulWidget {
   final int orderid;
   final List<TankItem> selecteditem;

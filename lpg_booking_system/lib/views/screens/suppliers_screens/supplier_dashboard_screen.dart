@@ -287,7 +287,7 @@ class _SupplierdashboardScreenState extends State<SupplierdashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Shop Stock Details",
+            "Plant Details",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),

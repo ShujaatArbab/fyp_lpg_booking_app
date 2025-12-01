@@ -7,7 +7,6 @@ import 'package:lpg_booking_system/models/customers_models/accessories_request.d
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/placeorder_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 

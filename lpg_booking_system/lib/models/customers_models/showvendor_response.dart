@@ -6,6 +6,7 @@ class VendorResponse {
   final double? longitude;
   final double? latitude;
   final String city;
+  final double averageRating;
   final List<Shop> shops; // ✅ Add this
 
   VendorResponse({
@@ -16,7 +17,8 @@ class VendorResponse {
     required this.name,
     required this.phone,
     required this.userID,
-    required this.shops, // ✅ Add this
+    required this.shops,
+    required this.averageRating, // ✅ Add this
   });
 
   factory VendorResponse.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class VendorResponse {
       name: json['Name'] ?? '',
       phone: json['Phone'] ?? '',
       userID: json['UserID'].toString(),
+      averageRating: (json['AverageRating'] as num?)?.toDouble() ?? 0.0,
       shops:
           (json['Shops'] as List<dynamic>? ?? [])
               .map((shopJson) => Shop.fromJson(shopJson))

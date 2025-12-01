@@ -84,7 +84,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
       return;
     }
 
-    final accessoriesMap = selectedAccessories as Map<String, int>;
+    final accessoriesMap = selectedAccessories;
 
     // Determine available quantity
     int availableQty = 0;
@@ -157,9 +157,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) =>
-                        MyOrdersScreen(buyerId: widget.customer.userid),
+                builder: (context) => MyOrdersScreen(buyerId: widget.customer),
               ),
             );
           }
@@ -217,7 +215,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
-                    width: 120,
+                    width: 130,
                     height: 50,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.orange, width: 2),

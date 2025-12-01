@@ -106,9 +106,8 @@ class _FinalorderconfirmScreenState extends State<FinalorderconfirmScreen> {
                             context,
                             MaterialPageRoute(
                               builder:
-                                  (context) => MyOrdersScreen(
-                                    buyerId: widget.customer.userid,
-                                  ),
+                                  (context) =>
+                                      MyOrdersScreen(buyerId: widget.customer),
                             ),
                           );
                         },

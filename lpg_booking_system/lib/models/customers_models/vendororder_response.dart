@@ -5,7 +5,7 @@ class Order {
   final String buyerCity;
   final String status;
   final String orderDate;
-  final String deliveryDate;
+  final String? deliveryDate;
   final String city;
   final List<OrderItem> items;
 
@@ -16,7 +16,7 @@ class Order {
     required this.buyerCity,
     required this.status,
     required this.orderDate,
-    required this.deliveryDate,
+    this.deliveryDate,
     required this.city,
     required this.items,
   });

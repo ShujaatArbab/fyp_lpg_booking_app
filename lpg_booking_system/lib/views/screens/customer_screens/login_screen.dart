@@ -39,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     final response = await LoginController().login(request);
+    print(response);
 
     //!  login fails
     if (response == null) {
