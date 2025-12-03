@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/deliveryperson_controller.dart';
-import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
+
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
 
 class DeliveryPersonListScreen extends StatefulWidget {
   final String vendorId;
-  final Order order;
 
-  const DeliveryPersonListScreen({
-    super.key,
-    required this.vendorId,
-    required this.order,
-  });
+  const DeliveryPersonListScreen({super.key, required this.vendorId});
 
   @override
   State<DeliveryPersonListScreen> createState() =>

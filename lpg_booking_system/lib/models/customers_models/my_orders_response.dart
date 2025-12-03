@@ -29,7 +29,7 @@ class CustomerOrders {
   final String? deliveryDate;
   final String status;
   final String? city;
-  final dynamic price;
+  final dynamic? price;
   final List<CustomerOrderItem> items;
 
   CustomerOrders({

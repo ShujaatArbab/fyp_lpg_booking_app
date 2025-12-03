@@ -4,7 +4,6 @@ import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/order_details_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/complaint_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
-import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class CustomerOrderDetails extends StatefulWidget {

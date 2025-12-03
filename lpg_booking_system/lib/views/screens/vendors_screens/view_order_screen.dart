@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/accept_order_controller.dart';
-import 'package:lpg_booking_system/models/customers_models/vendororder_response.dart';
-
+import 'package:lpg_booking_system/controllers/vendor_controller/order_details_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/login_response.dart';
+import 'package:lpg_booking_system/models/customers_models/order_details_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
-import 'package:lpg_booking_system/views/screens/vendors_screens/deliverperson_screen.dart'; // 👈 add controller
+import 'package:lpg_booking_system/views/screens/vendors_screens/deliverperson_screen.dart';
 
 class OrderDetailScreen extends StatefulWidget {
-  final Order order;
-  final String vendorId;
+  final int orderId;
+  final LoginResponse vendorId;
 
   const OrderDetailScreen({
     super.key,
-    required this.order,
+    required this.orderId,
     required this.vendorId,
   });
 
@@ -20,20 +21,53 @@ class OrderDetailScreen extends StatefulWidget {
 }
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  OrderDetailsResponse? orderDetails;
   String? dpName;
   String? dpPhone;
   bool isLoading = false;
+  bool isFetching = true;
+
+  final VendorOrderDetailsController _controller =
+      VendorOrderDetailsController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrderDetails();
+  }
+
+  Future<void> _fetchOrderDetails() async {
+    setState(() {
+      isFetching = true;
+    });
+
+    final details = await _controller.fetchOrderDetails(widget.orderId);
+
+    if (details != null && mounted) {
+      setState(() {
+        orderDetails = details;
+        isFetching = false;
+      });
+    } else if (mounted) {
+      setState(() {
+        isFetching = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch order details"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   /// Fixed cylinder prices
   double getCylinderPrice(String size) {
-    switch (size) {
-      case "11Kg":
+    switch (size.toLowerCase()) {
       case "11kg":
         return 2780;
-      case "15Kg":
       case "15kg":
         return 3720;
-      case "45Kg":
       case "45kg":
         return 11160;
       default:
@@ -42,14 +76,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> _acceptOrder() async {
+    if (orderDetails == null) return;
+
     setState(() {
       isLoading = true;
     });
 
     try {
       final result = await AcceptOrderController.acceptOrder(
-        orderId: widget.order.orderId,
-        vendorId: widget.vendorId,
+        orderId: orderDetails!.orderId,
+        vendorId: widget.vendorId.userid,
       );
 
       if (!mounted) return;
@@ -61,7 +97,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ),
       );
 
-      // Optionally go back after success
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
@@ -83,12 +118,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> itemDetails =
-        widget.order.items.map((item) {
-          final price = getCylinderPrice(item.cylinderSize);
+    if (isFetching) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (orderDetails == null) {
+      return const Scaffold(
+        body: Center(child: Text("No order details available")),
+      );
+    }
+
+    final itemDetails =
+        orderDetails!.items.map((item) {
+          final price = getCylinderPrice(item.cylinderType);
           final total = price * item.quantity;
           return {
-            "size": item.cylinderSize,
+            "size": item.cylinderType,
             "quantity": item.quantity,
             "price": price,
             "total": total,
@@ -96,8 +141,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         }).toList();
 
     final double grandTotal = itemDetails.fold(
-      0,
-      (sum, item) => sum + item["total"],
+      0.0,
+      (sum, item) => sum + (item["total"] as num).toDouble(),
     );
 
     return Scaffold(
@@ -127,14 +172,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "ORDER ID: ${widget.order.orderId}",
+                      "ORDER ID: ${orderDetails!.orderId}",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text("Customer Id: ${widget.order.buyerName}"),
+                    Text("Customer Id: ${orderDetails!.buyer.id}"),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,20 +194,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 fontSize: 14,
                               ),
                             ),
-                            Text(widget.order.buyerCity),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Phone",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(widget.order.buyerPhone),
+                            Text(orderDetails!.buyer.city),
                           ],
                         ),
                       ],
@@ -203,8 +235,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       MaterialPageRoute(
                         builder:
                             (context) => DeliveryPersonListScreen(
-                              order: widget.order,
-                              vendorId: widget.vendorId,
+                              vendorId: widget.vendorId.userid,
                             ),
                       ),
                     );
@@ -265,7 +296,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(
                           children: [
-                            Expanded(flex: 2, child: Text(item["size"])),
+                            Expanded(
+                              flex: 2,
+                              child: Text(item["size"].toString()),
+                            ),
+
                             Expanded(
                               child: Text(
                                 "${item["quantity"]}",
