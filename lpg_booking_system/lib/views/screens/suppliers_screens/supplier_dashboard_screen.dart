@@ -5,6 +5,7 @@ import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/vendor_dashboard_response.dart';
 import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_profile.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
@@ -90,14 +91,9 @@ class _SupplierdashboardScreenState extends State<SupplierdashboardScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OrdersScreen(vendorId: widget.supplier),
-              ),
-            );
-          } else if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileScreen(profile: widget.supplier),
+                builder:
+                    (context) =>
+                        SupplierProfileScreen(profile: widget.supplier),
               ),
             );
           }

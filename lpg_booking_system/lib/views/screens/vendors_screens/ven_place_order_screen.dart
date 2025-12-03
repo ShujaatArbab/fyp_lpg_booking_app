@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
-import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_orderconfirm_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_profile.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/custom_cylindercard.dart';
@@ -151,7 +151,8 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfileScreen(profile: widget.vendor),
+                builder:
+                    (context) => VendorProfileScreen(profile: widget.vendor),
               ),
             );
           }

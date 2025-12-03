@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_dashboard_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class SupplierProfileScreen extends StatefulWidget {
   final LoginResponse profile;
-  const ProfileScreen({super.key, required this.profile});
+  const SupplierProfileScreen({super.key, required this.profile});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<SupplierProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<SupplierProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,7 +94,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              SupplierOrdersScreen(supplierId: widget.profile),
+                    ),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.only(left: 10),
                   width: 385,
@@ -138,7 +151,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              SupplierdashboardScreen(supplier: widget.profile),
+                    ),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.only(left: 10),
                   width: 385,
@@ -151,15 +173,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Container(
                             margin: EdgeInsets.only(left: 20),
                             child: Icon(
-                              Icons.location_on,
+                              Icons.home,
                               color: Colors.orangeAccent,
                               size: 30,
                             ),
                           ),
-                          SizedBox(width: 100),
+                          SizedBox(width: 90),
 
                           Text(
-                            'Address',
+                            'My Dashboard',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,
@@ -167,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                          SizedBox(width: 110),
+                          SizedBox(width: 50),
                           Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.orangeAccent,

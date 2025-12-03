@@ -3,9 +3,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/vendor_dashboard_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/vendor_dashboard_response.dart';
-import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/show_supplier_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_profile.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 
 class VendorDashboardScreen extends StatefulWidget {
@@ -94,7 +94,8 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfileScreen(profile: widget.vendor),
+                builder:
+                    (context) => VendorProfileScreen(profile: widget.vendor),
               ),
             );
           }

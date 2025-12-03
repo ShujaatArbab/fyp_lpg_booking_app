@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/supplier_order_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/suppliers_models/getsupplier_order_response.dart';
-import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_order_details_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_dashboard_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_profile.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class SupplierOrdersScreen extends StatefulWidget {
@@ -51,7 +51,8 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
                 context,
                 MaterialPageRoute(
                   builder:
-                      (context) => ProfileScreen(profile: widget.supplierId),
+                      (context) =>
+                          SupplierProfileScreen(profile: widget.supplierId),
                 ),
               );
             }

@@ -5,6 +5,7 @@ import 'package:lpg_booking_system/models/vendors_models/currentorders_reponse.d
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/complaint_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
+
 import 'package:lpg_booking_system/views/screens/vendors_screens/view_order_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -217,6 +218,7 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
                     "RATE ORDER",
                     Colors.white,
                     Colors.orange,
+
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -310,7 +312,7 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: bgColor,
             foregroundColor: borderColor,
-            side: BorderSide(color: borderColor),
+            side: BorderSide(color: borderColor, width: 2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
