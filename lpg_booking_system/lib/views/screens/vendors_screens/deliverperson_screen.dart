@@ -3,7 +3,6 @@ import 'package:lpg_booking_system/controllers/vendor_controller/deliveryperson_
 import 'package:lpg_booking_system/controllers/vendor_controller/assign_deliveryperson_controller.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/assign_deliveryperson_request.dart';
-import 'package:lpg_booking_system/models/vendors_models/assign_deliveryperson_response.dart';
 
 class DeliveryPersonListScreen extends StatefulWidget {
   final String vendorId;
@@ -35,7 +34,7 @@ class _DeliveryPersonListScreenState extends State<DeliveryPersonListScreen> {
   Future<void> _assignDeliveryPerson(DeliveryPerson dp) async {
     final request = AssignDeliveryPersonRequest(
       orderId: widget.orderId,
-      deliveryPerson: dp.name,
+      deliveryPersonName: dp.name,
     );
 
     final controller = AssignDeliveryPersonController();

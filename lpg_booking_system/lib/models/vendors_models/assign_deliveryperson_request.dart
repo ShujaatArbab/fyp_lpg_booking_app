@@ -1,14 +1,14 @@
 class AssignDeliveryPersonRequest {
   final int orderId;
-  final String deliveryPerson;
+  final String deliveryPersonName;
 
   AssignDeliveryPersonRequest({
     required this.orderId,
-    required this.deliveryPerson,
+    required this.deliveryPersonName,
   });
 
   Map<String, dynamic> toJson() => {
-    "Order_id": orderId,
-    "delivery_person": deliveryPerson,
+    "OrderId": orderId,
+    "DeliveryPersonName": deliveryPersonName,
   };
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_controller.dart';
 import 'package:lpg_booking_system/controllers/supplier_controller/accept_order_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/suppliers_models/getsupplier_order_response.dart';
 
 class SupplierOrderDetailScreen extends StatefulWidget {
@@ -22,14 +24,11 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
 
   /// Fixed cylinder prices
   double getCylinderPrice(String size) {
-    switch (size) {
-      case "11Kg":
+    switch (size.toLowerCase()) {
       case "11kg":
         return 2780;
-      case "15Kg":
       case "15kg":
         return 3720;
-      case "45Kg":
       case "45kg":
         return 11160;
       default:
@@ -57,10 +56,48 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
         ),
       );
 
-      Navigator.pop(context, true); // go back to list after success
+      Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _rejectOrder() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final request = CancelOrderRequest(orderId: widget.order.orderId);
+      final response = await CancelOrderController().cancelOrder(request);
+
+      if (response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to cancel order"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
       );
@@ -260,6 +297,30 @@ class _SupplierOrderDetailScreenState extends State<SupplierOrderDetailScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                             "Accept Order",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// Reject Order Button
+            Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _rejectOrder,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            "Reject Order",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

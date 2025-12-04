@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/accept_order_controller.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/order_details_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_controller.dart';
+import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/order_details_response.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
@@ -78,6 +80,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Future<void> _acceptOrder() async {
     if (orderDetails == null) return;
 
+    if (dpName == null || dpName!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please assign a delivery person before accepting"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
@@ -106,6 +118,46 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           content: Text("Error: $e"),
           backgroundColor: const Color.fromARGB(255, 70, 68, 68),
         ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _rejectOrder() async {
+    if (orderDetails == null) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final request = CancelOrderRequest(orderId: orderDetails!.orderId);
+      final response = await CancelOrderController().cancelOrder(request);
+
+      if (response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to cancel order"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
@@ -301,7 +353,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               flex: 2,
                               child: Text(item["size"].toString()),
                             ),
-
                             Expanded(
                               child: Text(
                                 "${item["quantity"]}",
@@ -360,6 +411,36 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                             "Accept Order",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// Reject Order Button
+            Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: isLoading ? null : _rejectOrder,
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            "Reject Order",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

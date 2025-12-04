@@ -4,7 +4,6 @@ import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/update_prices_screen.dart';
-import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 
 class VendorProfileScreen extends StatefulWidget {
   final LoginResponse profile;
