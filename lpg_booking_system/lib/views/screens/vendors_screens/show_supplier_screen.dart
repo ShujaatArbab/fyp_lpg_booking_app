@@ -11,6 +11,7 @@ import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_place_order_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart'; // import notifications screen
+import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_profile.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
 
@@ -99,7 +100,8 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfileScreen(profile: widget.vendor),
+                builder:
+                    (context) => VendorProfileScreen(profile: widget.vendor),
               ),
             );
           }

@@ -236,6 +236,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         builder:
                             (context) => DeliveryPersonListScreen(
                               vendorId: widget.vendorId.userid,
+                              orderId: widget.orderId,
                             ),
                       ),
                     );

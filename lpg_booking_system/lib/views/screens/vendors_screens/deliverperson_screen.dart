@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/deliveryperson_controller.dart';
-
+import 'package:lpg_booking_system/controllers/vendor_controller/assign_deliveryperson_controller.dart';
 import 'package:lpg_booking_system/models/vendors_models/deliveryperson_response.dart';
+import 'package:lpg_booking_system/models/vendors_models/assign_deliveryperson_request.dart';
+import 'package:lpg_booking_system/models/vendors_models/assign_deliveryperson_response.dart';
 
 class DeliveryPersonListScreen extends StatefulWidget {
   final String vendorId;
+  final int orderId; // Add orderId to know which order to assign
 
-  const DeliveryPersonListScreen({super.key, required this.vendorId});
+  const DeliveryPersonListScreen({
+    super.key,
+    required this.vendorId,
+    required this.orderId,
+  });
 
   @override
   State<DeliveryPersonListScreen> createState() =>
@@ -24,11 +31,33 @@ class _DeliveryPersonListScreenState extends State<DeliveryPersonListScreen> {
     );
   }
 
+  // Assign delivery person to order via API
+  Future<void> _assignDeliveryPerson(DeliveryPerson dp) async {
+    final request = AssignDeliveryPersonRequest(
+      orderId: widget.orderId,
+      deliveryPerson: dp.name,
+    );
+
+    final controller = AssignDeliveryPersonController();
+    final response = await controller.assignDeliveryPerson(request);
+
+    if (response != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response.message)));
+
+      // Return selected delivery person to previous screen
+      Navigator.pop(context, dp);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to assign delivery person")),
+      );
+    }
+  }
+
   void _selectDeliveryPerson(DeliveryPerson dp) {
-    Navigator.pop(
-      context,
-      dp,
-    ); // ✅ return selected delivery person to previous screen
+    // Call API to assign delivery person
+    _assignDeliveryPerson(dp);
   }
 
   @override

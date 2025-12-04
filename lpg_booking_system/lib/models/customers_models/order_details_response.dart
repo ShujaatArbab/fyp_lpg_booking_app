@@ -34,6 +34,7 @@ class OrderDetailsResponse {
       status: json['Status'],
       latitude: (json['Latitude'] as num).toDouble(),
       longitude: (json['Longitude'] as num).toDouble(),
+
       items: (json['Items'] as List).map((e) => OrderItem.fromJson(e)).toList(),
     );
   }

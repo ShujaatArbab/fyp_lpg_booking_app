@@ -3,6 +3,7 @@ import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/update_prices_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
 
 class VendorProfileScreen extends StatefulWidget {
@@ -153,8 +154,9 @@ class _ProfileScreenState extends State<VendorProfileScreen> {
                     context,
                     MaterialPageRoute(
                       builder:
-                          (context) =>
-                              VendorDashboardScreen(vendor: widget.profile),
+                          (context) => UpdatePricesScreen(
+                            vendorUserId: widget.profile.userid,
+                          ),
                     ),
                   );
                 },
@@ -178,7 +180,7 @@ class _ProfileScreenState extends State<VendorProfileScreen> {
                           SizedBox(width: 90),
 
                           Text(
-                            'My Dashboard',
+                            'Update Prices',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,
