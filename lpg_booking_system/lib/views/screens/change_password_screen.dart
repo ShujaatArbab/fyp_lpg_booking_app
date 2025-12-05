@@ -131,7 +131,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               alignment: Alignment.centerLeft,
               child: const Text(
                 "Please enter your old and new password",
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 30),

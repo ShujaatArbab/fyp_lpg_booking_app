@@ -3,7 +3,9 @@ import 'package:lpg_booking_system/controllers/customer_controller/order_details
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/order_details_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/complaint_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
+import 'package:lpg_booking_system/views/screens/profile_screen.dart';
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
 class CustomerOrderDetails extends StatefulWidget {
@@ -60,6 +62,22 @@ class _CustomerOrderDetailsState extends State<CustomerOrderDetails> {
               MaterialPageRoute(
                 builder:
                     (context) => ShowVendorScreen(customer: widget.customer),
+              ),
+            );
+          }
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyOrdersScreen(buyerId: widget.customer),
+              ),
+            );
+          }
+          if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(profile: widget.customer),
               ),
             );
           }

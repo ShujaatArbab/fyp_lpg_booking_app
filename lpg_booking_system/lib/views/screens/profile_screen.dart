@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final LoginResponse profile;
@@ -90,7 +91,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => MyOrdersScreen(buyerId: widget.profile),
+                    ),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.only(left: 10),
                   width: 385,
