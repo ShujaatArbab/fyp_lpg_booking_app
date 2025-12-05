@@ -292,7 +292,7 @@ class _ProfileScreenState extends State<VendorProfileScreen> {
                           SizedBox(width: 60),
 
                           Text(
-                            'Get Complaints',
+                            'See Complaints',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,

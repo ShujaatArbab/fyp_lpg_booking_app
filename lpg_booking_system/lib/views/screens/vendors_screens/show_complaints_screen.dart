@@ -3,6 +3,7 @@ import 'package:lpg_booking_system/controllers/vendor_controller/get_complaint_c
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 
 import 'package:lpg_booking_system/models/vendors_models/get_complaint_response.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/solve_complaint_screen.dart';
 
 class ShowComplaintsScreen extends StatefulWidget {
   final LoginResponse vendorId; // vendorId passed from profile
@@ -110,8 +111,16 @@ class _ShowComplaintsScreenState extends State<ShowComplaintsScreen> {
                           ),
                         ),
                         onPressed: () {
-                          // TODO: Navigate to Solve Complaint Screen
-                          print("Solve complaint ${c.comId}");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => SolveComplaintScreen(
+                                    vendorId: widget.vendorId,
+                                    orderId: c.orderId,
+                                  ),
+                            ),
+                          );
                         },
                         child: const Text(
                           "Solve",
