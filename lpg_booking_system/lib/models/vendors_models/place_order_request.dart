@@ -13,11 +13,13 @@ class VendorOrderRequest {
   final String buyerId; // Vendor ID
   final String sellerId; // Supplier ID
   final List<OrderItemRequest> orderItems;
+  final int totalPrice;
 
   VendorOrderRequest({
     required this.buyerId,
     required this.sellerId,
     required this.orderItems,
+    required this.totalPrice,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,6 +27,7 @@ class VendorOrderRequest {
       "Buyer_id": buyerId,
       "Seller_id": sellerId,
       "OrderItems": orderItems.map((e) => e.toJson()).toList(),
+      "price": totalPrice,
     };
   }
 }

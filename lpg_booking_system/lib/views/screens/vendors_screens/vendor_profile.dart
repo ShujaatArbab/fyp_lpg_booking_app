@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<VendorProfileScreen> {
                           Container(
                             margin: EdgeInsets.only(left: 20),
                             child: Icon(
-                              Icons.lock,
+                              Icons.message,
                               color: Colors.orangeAccent,
                               size: 30,
                             ),

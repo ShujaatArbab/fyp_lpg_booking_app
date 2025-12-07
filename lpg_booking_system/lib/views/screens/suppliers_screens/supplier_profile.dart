@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/suppliers_screens/show_complaint_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_dashboard_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/update_prices_screen.dart';
 
 class SupplierProfileScreen extends StatefulWidget {
   final LoginResponse profile;
@@ -154,8 +156,9 @@ class _ProfileScreenState extends State<SupplierProfileScreen> {
                     context,
                     MaterialPageRoute(
                       builder:
-                          (context) =>
-                              SupplierdashboardScreen(supplier: widget.profile),
+                          (context) => UpdatePricesScreen(
+                            vendorUserId: widget.profile.userid,
+                          ),
                     ),
                   );
                 },
@@ -179,7 +182,7 @@ class _ProfileScreenState extends State<SupplierProfileScreen> {
                           SizedBox(width: 90),
 
                           Text(
-                            'My Dashboard',
+                            'Update Prices',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,
@@ -237,6 +240,62 @@ class _ProfileScreenState extends State<SupplierProfileScreen> {
 
                           Text(
                             'Change Password',
+                            style: TextStyle(
+                              color: Colors.orangeAccent,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          SizedBox(width: 60),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.orangeAccent,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => ShowSupplierComplaintsScreen(
+                            supplierId: widget.profile,
+                          ),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10),
+                  width: 385,
+                  height: 70,
+                  child: Card(
+                    color: Colors.white,
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(left: 20),
+                            child: Icon(
+                              Icons.message,
+                              color: Colors.orangeAccent,
+                              size: 30,
+                            ),
+                          ),
+                          SizedBox(width: 60),
+
+                          Text(
+                            'See Complaints',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,

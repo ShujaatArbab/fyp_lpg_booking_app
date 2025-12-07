@@ -75,11 +75,13 @@ class Stock {
   final int stockId;
   final int cylinderId;
   final int quantityAvailable;
+  final int price;
 
   Stock({
     required this.stockId,
     required this.cylinderId,
     required this.quantityAvailable,
+    required this.price,
   });
 
   factory Stock.fromJson(Map<String, dynamic> json) {
@@ -87,6 +89,7 @@ class Stock {
       stockId: json['StockID'] ?? 0,
       cylinderId: json['CylinderID'] ?? 0,
       quantityAvailable: json['QuantityAvailable'] ?? 0,
+      price: json['Price'] ?? 0,
     );
   }
 }

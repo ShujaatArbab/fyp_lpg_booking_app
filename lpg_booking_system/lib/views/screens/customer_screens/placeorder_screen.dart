@@ -14,6 +14,9 @@ class PlaceorderScreen extends StatefulWidget {
   final int smallQty;
   final int mediumQty;
   final int largeQty;
+  final double smallPrice;
+  final double mediumPrice;
+  final double largePrice;
   final String vendorId;
   final String vendorName;
   final String vendorPhone;
@@ -32,6 +35,9 @@ class PlaceorderScreen extends StatefulWidget {
     required this.smallQty,
     required this.mediumQty,
     required this.largeQty,
+    required this.smallPrice,
+    required this.mediumPrice,
+    required this.largePrice,
   });
 
   @override
@@ -44,11 +50,15 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
   int quantity = 1;
   List<TankItem> selecteditem = [];
 
-  final Map<String, int> tankprices = {
-    '11kg': 2780,
-    '15kg': 3720,
-    '45kg': 11160,
-  };
+  final Map<String, double> tankprices = {};
+
+  @override
+  void initState() {
+    super.initState();
+    tankprices['11kg'] = widget.smallPrice;
+    tankprices['15kg'] = widget.mediumPrice;
+    tankprices['45kg'] = widget.largePrice;
+  }
 
   void increment() => setState(() => quantity++);
   void decrement() {
@@ -120,7 +130,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
         selecteditem.add(
           TankItem(
             size: size,
-            price: tankprices[size]!,
+            price: tankprices[size]!.toInt(),
             quantity: quantity,
             accessories:
                 accessoriesMap.entries
@@ -140,6 +150,12 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate grand total
+    int grandTotal = selecteditem.fold(
+      0,
+      (sum, item) => sum + (item.price * item.quantity),
+    );
+
     return Scaffold(
       bottomNavigationBar: CustomerNavbar(
         currentindex: 0,
@@ -290,7 +306,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
                               ),
                             ),
                             Text(
-                              'Rs ${tankprices[size]}',
+                              'Rs ${tankprices[size]?.toStringAsFixed(0)}',
                               style: TextStyle(
                                 color:
                                     selectedsize == size
@@ -315,7 +331,7 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Selected Cylinders List
+              // Selected Cylinders List + Grand Total
               const Text(
                 "Your Order:",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -323,36 +339,59 @@ class _PlaceorderScreenState extends State<PlaceorderScreen> {
               const SizedBox(height: 10),
               selecteditem.isEmpty
                   ? const Text("No cylinders added yet.")
-                  : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: selecteditem.length,
-                    itemBuilder: (context, index) {
-                      final cylinder = selecteditem[index];
-                      return CustomCylinderCard(
-                        size: cylinder.size,
-                        price: cylinder.price,
-                        quantity: cylinder.quantity,
-                        onDelete: () => deletecard(index),
-                        extraWidget:
-                            cylinder.accessories != null
-                                ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children:
-                                      cylinder.accessories!
-                                          .map(
-                                            (acc) => Text(
-                                              acc,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                )
-                                : null,
-                      );
-                    },
+                  : Column(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: selecteditem.length,
+                        itemBuilder: (context, index) {
+                          final cylinder = selecteditem[index];
+                          return CustomCylinderCard(
+                            size: cylinder.size,
+                            price: cylinder.price,
+                            quantity: cylinder.quantity,
+                            onDelete: () => deletecard(index),
+                            extraWidget:
+                                cylinder.accessories != null
+                                    ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          cylinder.accessories!
+                                              .map(
+                                                (acc) => Text(
+                                                  acc,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                    )
+                                    : null,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Total: Rs $grandTotal',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                    ],
                   ),
               const SizedBox(height: 20),
 

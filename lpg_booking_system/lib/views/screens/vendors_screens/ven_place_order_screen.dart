@@ -19,6 +19,9 @@ class VendorPlaceorderScreen extends StatefulWidget {
   final int smallQty; // 11kg stock
   final int mediumQty; // 15kg stock
   final int largeQty; // 45kg stock
+  final int smallPrice;
+  final int mediumPrice;
+  final int largePrice;
 
   const VendorPlaceorderScreen({
     super.key,
@@ -31,6 +34,9 @@ class VendorPlaceorderScreen extends StatefulWidget {
     required this.smallQty,
     required this.mediumQty,
     required this.largeQty,
+    required this.smallPrice,
+    required this.mediumPrice,
+    required this.largePrice,
   });
 
   @override
@@ -43,11 +49,17 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
   int selectedIndex = 0;
   List<TankItem> selectedItems = [];
 
-  final Map<String, int> tankPrices = {
-    '11kg': 2780,
-    '15kg': 3720,
-    '45kg': 11160,
-  };
+  late final Map<String, int> tankPrices;
+
+  @override
+  void initState() {
+    super.initState();
+    tankPrices = {
+      '11kg': widget.smallPrice,
+      '15kg': widget.mediumPrice,
+      '45kg': widget.largePrice,
+    };
+  }
 
   int getStock(String size) {
     switch (size) {
@@ -121,6 +133,13 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
     });
   }
 
+  int getGrandTotal() {
+    return selectedItems.fold(
+      0,
+      (sum, item) => sum + (item.price * item.quantity),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,9 +155,7 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
               ),
             );
           }
-          if (index == 1) {
-            return;
-          }
+          if (index == 1) return;
           if (index == 2) {
             Navigator.push(
               context,
@@ -173,7 +190,7 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
           children: [
             // Supplier Info
             Container(
-              width: 800,
+              width: double.infinity,
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.orange, width: 2),
@@ -268,17 +285,14 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                Container(
-                  margin: EdgeInsets.only(left: 80),
-                  child: ElevatedButton(
-                    onPressed: addCylinder,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                    ),
-                    child: const Text(
-                      'Add Cylinder',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                ElevatedButton(
+                  onPressed: addCylinder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                  ),
+                  child: const Text(
+                    'Add Cylinder',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -291,26 +305,49 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Center(
-              child:
-                  selectedItems.isEmpty
-                      ? const Text('No cylinders added yet.')
-                      : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: selectedItems.length,
-                        itemBuilder: (context, index) {
-                          final item = selectedItems[index];
-                          return CustomCylinderCard(
-                            size: item.size,
-                            price: item.price,
-                            quantity: item.quantity,
-                            onDelete: () => deleteCard(index),
-                            extraWidget: null,
-                          );
-                        },
+            selectedItems.isEmpty
+                ? const Center(child: Text('No cylinders added yet.'))
+                : Column(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: selectedItems.length,
+                      itemBuilder: (context, index) {
+                        final item = selectedItems[index];
+                        return CustomCylinderCard(
+                          size: item.size,
+                          price: item.price,
+                          quantity: item.quantity,
+                          onDelete: () => deleteCard(index),
+                          extraWidget: null,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
                       ),
-            ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Total: Rs ${getGrandTotal()}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
+                ),
 
             const SizedBox(height: 20),
 
@@ -345,6 +382,8 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
 
   Widget tankButton(String size) {
     final stock = getStock(size);
+    final price = tankPrices[size] ?? 0;
+
     return ElevatedButton(
       onPressed: stock > 0 ? () => selectSize(size) : null,
       style: ElevatedButton.styleFrom(
@@ -361,7 +400,7 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
             ),
           ),
           Text(
-            'Rs ${tankPrices[size]}',
+            'Rs $price',
             style: TextStyle(
               color: selectedSize == size ? Colors.white : Colors.black,
             ),

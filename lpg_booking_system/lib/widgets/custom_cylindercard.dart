@@ -26,14 +26,14 @@ class CustomCylinderCard extends StatelessWidget {
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.orange, width: 2),
+        side: const BorderSide(color: Colors.orange, width: 2),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Safe icon replacement
+            // Cylinder icon
             const Icon(
               Icons.local_fire_department,
               color: Colors.red,
@@ -41,7 +41,7 @@ class CustomCylinderCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Texts + button
+            // Texts + optional extra widgets
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,14 @@ class CustomCylinderCard extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  Text("Rs $tprice", style: TextStyle(color: Colors.grey[700])),
+                  Text(
+                    "Rs $tprice",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     "Quantity: $quantity",
@@ -72,11 +79,7 @@ class CustomCylinderCard extends StatelessWidget {
 
             // Delete button
             IconButton(
-              icon: const Icon(
-                Icons.delete,
-                color: Color.fromARGB(255, 228, 19, 4),
-                size: 28,
-              ),
+              icon: const Icon(Icons.delete, color: Colors.red, size: 28),
               onPressed: onDelete,
             ),
           ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:lpg_booking_system/controllers/vendor_controller/getsupplier_stock_controller.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/place_order_controller.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
@@ -36,7 +35,6 @@ class VendorOrderConfirmationScreen extends StatefulWidget {
 class _VendorOrderConfirmationScreenState
     extends State<VendorOrderConfirmationScreen> {
   bool _isLoading = false;
-
   Map<String, int> stockMap = {};
 
   @override
@@ -57,6 +55,13 @@ class _VendorOrderConfirmationScreenState
         const SnackBar(content: Text("Failed to load supplier stock")),
       );
     }
+  }
+
+  int getGrandTotal() {
+    return widget.selectedItems.fold(
+      0,
+      (sum, item) => sum + (item.price * item.quantity),
+    );
   }
 
   Future<void> _placeOrder() async {
@@ -97,18 +102,16 @@ class _VendorOrderConfirmationScreenState
         buyerId: widget.vendor.userid,
         sellerId: widget.supplierId,
         orderItems: orderItems,
+        totalPrice: getGrandTotal(), // ✅ Send total price to backend
       );
 
-      // Call API
       final response = await VendorOrder().vendorplacesorders(request);
 
-      // ✅ Get order ID safely
       final orderId = response.orderId ?? 0;
       if (orderId == 0) throw Exception("Invalid order ID returned");
 
       if (!mounted) return;
 
-      // Navigate to final order confirmation
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -229,22 +232,47 @@ class _VendorOrderConfirmationScreenState
             const SizedBox(height: 10),
             widget.selectedItems.isEmpty
                 ? const Center(child: Text("No products added"))
-                : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.selectedItems.length,
-                  itemBuilder: (context, index) {
-                    final item = widget.selectedItems[index];
-                    return CustomCylinderCard(
-                      size: item.size,
-                      price: item.price,
-                      quantity: item.quantity,
-                      onDelete: () => deleteItem(index),
-                      extraWidget: null,
-                    );
-                  },
+                : Column(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: widget.selectedItems.length,
+                      itemBuilder: (context, index) {
+                        final item = widget.selectedItems[index];
+                        return CustomCylinderCard(
+                          size: item.size,
+                          price: item.price,
+                          quantity: item.quantity,
+                          onDelete: () => deleteItem(index),
+                          extraWidget: null,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Total: Rs ${getGrandTotal()}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
                 ),
-            const SizedBox(height: 20),
 
             // Place Order Button
             Center(

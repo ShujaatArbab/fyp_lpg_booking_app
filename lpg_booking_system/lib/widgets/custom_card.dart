@@ -10,6 +10,9 @@ class CustomCard extends StatelessWidget {
   final int smallQty; // Available small cylinders
   final int mediumQty; // Available medium cylinders
   final int largeQty; // Available large cylinders
+  final double smallPrice; // Small cylinder price
+  final double mediumPrice; // Medium cylinder price
+  final double largePrice; // Large cylinder price
   final VoidCallback onplaceorder;
 
   const CustomCard({
@@ -23,6 +26,9 @@ class CustomCard extends StatelessWidget {
     required this.smallQty,
     required this.mediumQty,
     required this.largeQty,
+    required this.smallPrice,
+    required this.mediumPrice,
+    required this.largePrice,
     required this.onplaceorder,
   });
 
@@ -88,13 +94,13 @@ class CustomCard extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            /// Cylinder availability
+            /// Cylinder availability with prices
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildCylinderInfo("Small", smallQty),
-                _buildCylinderInfo("Medium", mediumQty),
-                _buildCylinderInfo("Large", largeQty),
+                _buildCylinderInfo("Small", smallQty, smallPrice),
+                _buildCylinderInfo("Medium", mediumQty, mediumPrice),
+                _buildCylinderInfo("Large", largeQty, largePrice),
               ],
             ),
 
@@ -152,8 +158,8 @@ class CustomCard extends StatelessWidget {
     );
   }
 
-  /// Helper widget for cylinder info
-  Widget _buildCylinderInfo(String label, int qty) {
+  /// Helper widget for cylinder info with price
+  Widget _buildCylinderInfo(String label, int qty, double price) {
     return Column(
       children: [
         Text(
@@ -165,6 +171,14 @@ class CustomCard extends StatelessWidget {
           ),
         ),
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(
+          "\Rs ${price.toStringAsFixed(2)}",
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 244, 16, 0),
+          ),
+        ),
       ],
     );
   }

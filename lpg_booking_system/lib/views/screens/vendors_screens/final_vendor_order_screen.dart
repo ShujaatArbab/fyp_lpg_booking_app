@@ -3,6 +3,8 @@ import 'package:lpg_booking_system/global/tank_item.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'dart:ui';
 
+import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
+
 class FinalVendororderconfirmScreen extends StatefulWidget {
   final int orderid;
   final List<TankItem> selecteditem;
@@ -101,7 +103,16 @@ class _FinalorderconfirmScreenState
 
                       SizedBox(height: 20),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OrdersScreen(vendorId: widget.customer),
+                            ),
+                          );
+                        },
                         child: Text(
                           'View Order',
                           style: TextStyle(

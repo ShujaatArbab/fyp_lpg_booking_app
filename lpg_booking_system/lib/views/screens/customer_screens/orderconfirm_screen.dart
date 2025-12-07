@@ -64,7 +64,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     final controller = AccessoriesController();
 
     for (var acc in item.accessories!) {
-      // acc format: "Cooking / Stove x2"
       var parts = acc.split(' x');
       var purpose = parts[0].trim();
       var quantity = int.tryParse(parts[1].trim()) ?? 1;
@@ -73,8 +72,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
         userId: widget.customer.userid,
         cylinderId: getCylinderId(item.size),
         usagePurpose: purpose,
-        quantity:
-            quantity, // API might still expect string, backend converts to int
+        quantity: quantity,
       );
 
       try {
@@ -85,7 +83,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     }
   }
 
-  /// Map tank size to cylinder ID for Accessories API
   int getCylinderId(String size) {
     switch (size) {
       case '11kg':
@@ -99,7 +96,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     }
   }
 
-  /// Place order API call
+  /// Place order API call with total price
   Future<void> _placeOrder() async {
     if (widget.selecteditem.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,16 +112,23 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     final sellerId = widget.vendorId;
 
     try {
-      // First, place accessories API for each cylinder
+      // Place accessories for each cylinder
       for (var item in widget.selecteditem) {
         await placeAccessories(item);
       }
+
+      // Calculate grand total
+      int grandTotal = widget.selecteditem.fold(
+        0,
+        (sum, item) => sum + (item.price * item.quantity),
+      );
 
       // Build order request
       final request = OrderRequest(
         buyerId: widget.customer.userid,
         sellerId: sellerId,
         city: widget.vendorcity,
+        totalPrice: grandTotal, // ✅ send total price to backend
         items:
             widget.selecteditem.map((c) {
               return OrderItemRequest(
@@ -174,6 +178,12 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate grand total
+    int grandTotal = widget.selecteditem.fold(
+      0,
+      (sum, item) => sum + (item.price * item.quantity),
+    );
+
     return Scaffold(
       bottomNavigationBar: CustomerNavbar(
         currentindex: 0,
@@ -235,40 +245,68 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
           ),
           const SizedBox(height: 10),
 
-          // List of selected cylinders with accessories
+          // List of cylinders
           Expanded(
             child:
                 widget.selecteditem.isEmpty
                     ? const Center(child: Text("No products added"))
-                    : ListView.builder(
-                      itemCount: widget.selecteditem.length,
-                      itemBuilder: (context, index) {
-                        final cylinder = widget.selecteditem[index];
-                        return CustomCylinderCard(
-                          size: cylinder.size,
-                          price: cylinder.price,
-                          quantity: cylinder.quantity,
-                          onDelete: () => deleteCylinder(index),
-                          extraWidget:
-                              cylinder.accessories != null
-                                  ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children:
-                                        cylinder.accessories!
-                                            .map(
-                                              (acc) => Text(
-                                                acc,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                  )
-                                  : null,
-                        );
-                      },
+                    : Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: widget.selecteditem.length,
+                            itemBuilder: (context, index) {
+                              final cylinder = widget.selecteditem[index];
+                              return CustomCylinderCard(
+                                size: cylinder.size,
+                                price: cylinder.price,
+                                quantity: cylinder.quantity,
+                                onDelete: () => deleteCylinder(index),
+                                extraWidget:
+                                    cylinder.accessories != null
+                                        ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children:
+                                              cylinder.accessories!
+                                                  .map(
+                                                    (acc) => Text(
+                                                      acc,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                        )
+                                        : null,
+                              );
+                            },
+                          ),
+                        ),
+                        // Show grand total below cards
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Total: Rs $grandTotal',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
           ),
 

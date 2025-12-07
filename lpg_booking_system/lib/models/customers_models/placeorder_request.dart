@@ -14,12 +14,14 @@ class OrderRequest {
   final String sellerId;
   final String city;
   final List<OrderItemRequest> items;
+  final int totalPrice;
 
   OrderRequest({
     required this.buyerId,
     required this.sellerId,
     required this.city,
     required this.items,
+    required this.totalPrice,
   });
 
   Map<String, dynamic> toJson() {
@@ -28,6 +30,7 @@ class OrderRequest {
       "Seller_id": sellerId,
       "City": city,
       "OrderItems": items.map((e) => e.toJson()).toList(), // ✅ FIXED
+      "price": totalPrice,
     };
   }
 }

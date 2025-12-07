@@ -134,7 +134,6 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                       onPressed: () {
                         setState(() {
                           selectedRating = tempSelectedRating;
-                          // sort vendors by nearest rating
                           filteredVendorList = List.from(vendorList);
                           if (selectedRating > 0) {
                             filteredVendorList.sort((a, b) {
@@ -361,44 +360,39 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                         return Column(
                           children:
                               vendor.shops.map((shop) {
-                                int smallQty =
-                                    shop.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderId == 1,
-                                          orElse:
-                                              () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 1,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
+                                // ✅ get quantity and price for each cylinder
+                                final smallStock = shop.stock.firstWhere(
+                                  (s) => s.cylinderId == 1,
+                                  orElse:
+                                      () => Stock(
+                                        stockId: 0,
+                                        cylinderId: 1,
+                                        quantityAvailable: 0,
+                                        price: 0, // ✅ price fallback
+                                      ),
+                                );
 
-                                int mediumQty =
-                                    shop.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderId == 2,
-                                          orElse:
-                                              () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 2,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
+                                final mediumStock = shop.stock.firstWhere(
+                                  (s) => s.cylinderId == 2,
+                                  orElse:
+                                      () => Stock(
+                                        stockId: 0,
+                                        cylinderId: 2,
+                                        quantityAvailable: 0,
+                                        price: 0, // ✅ price fallback
+                                      ),
+                                );
 
-                                int largeQty =
-                                    shop.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderId == 3,
-                                          orElse:
-                                              () => Stock(
-                                                stockId: 0,
-                                                cylinderId: 3,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
+                                final largeStock = shop.stock.firstWhere(
+                                  (s) => s.cylinderId == 3,
+                                  orElse:
+                                      () => Stock(
+                                        stockId: 0,
+                                        cylinderId: 3,
+                                        quantityAvailable: 0,
+                                        price: 0, // ✅ price fallback
+                                      ),
+                                );
 
                                 return CustomCard(
                                   title: vendor.name,
@@ -409,9 +403,12 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                   ),
                                   shopName: shop.shopName,
                                   shopCity: shop.city,
-                                  smallQty: smallQty,
-                                  mediumQty: mediumQty,
-                                  largeQty: largeQty,
+                                  smallQty: smallStock.quantityAvailable,
+                                  mediumQty: mediumStock.quantityAvailable,
+                                  largeQty: largeStock.quantityAvailable,
+                                  smallPrice: smallStock.price.toDouble(),
+                                  mediumPrice: mediumStock.price.toDouble(),
+                                  largePrice: largeStock.price.toDouble(),
                                   onplaceorder: () {
                                     Navigator.push(
                                       context,
@@ -425,9 +422,18 @@ class _ShowVendorScreenState extends State<ShowVendorScreen> {
                                                   "${shop.shopName}, ${shop.city}",
                                               vendorcity: vendor.city,
                                               customer: widget.customer,
-                                              smallQty: smallQty,
-                                              mediumQty: mediumQty,
-                                              largeQty: largeQty,
+                                              smallQty:
+                                                  smallStock.quantityAvailable,
+                                              mediumQty:
+                                                  mediumStock.quantityAvailable,
+                                              largeQty:
+                                                  largeStock.quantityAvailable,
+                                              smallPrice:
+                                                  smallStock.price.toDouble(),
+                                              mediumPrice:
+                                                  mediumStock.price.toDouble(),
+                                              largePrice:
+                                                  largeStock.price.toDouble(),
                                             ),
                                       ),
                                     );

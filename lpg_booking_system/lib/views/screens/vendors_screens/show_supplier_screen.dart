@@ -9,7 +9,7 @@ import 'package:lpg_booking_system/views/screens/vendors_screens/add_shop_screen
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/ven_place_order_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
-import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart'; // import notifications screen
+import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_profile.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
 import 'package:lpg_booking_system/widgets/custom_card.dart';
@@ -26,7 +26,7 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
   int selectedIndex = 0;
   bool isLoading = true;
   List<SupplierResponse> supplierList = [];
-  int unreadCount = 0; // ⭐ unread notification count
+  int unreadCount = 0;
 
   @override
   void initState() {
@@ -35,7 +35,6 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
     fetchUnreadNotifications();
   }
 
-  //! fetch unread notifications for this vendor
   Future<void> fetchUnreadNotifications() async {
     try {
       final count = await NotificationController().fetchUnreadCount(
@@ -49,7 +48,6 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
     }
   }
 
-  //! fetch suppliers API
   Future<void> fetchSuppliers() async {
     try {
       final response = await SupplierController().getSuppliersByCity(
@@ -141,7 +139,7 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                         clipBehavior: Clip.none,
                         children: [
                           SizedBox(
-                            height: 40, // ensure enough height
+                            height: 40,
                             child: IconButton(
                               icon: const Icon(
                                 Icons.notifications_none,
@@ -149,18 +147,15 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                                 size: 30,
                               ),
                               onPressed: () async {
-                                // open notifications screen
                                 await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder:
                                         (context) => NotificationsScreen(
-                                          customer:
-                                              widget.vendor, // vendor as user
+                                          customer: widget.vendor,
                                         ),
                                   ),
                                 );
-                                // refresh unread count after returning
                                 await fetchUnreadNotifications();
                               },
                             ),
@@ -340,44 +335,37 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                         return Column(
                           children:
                               supplier.plants.map((plant) {
-                                int smallQty =
-                                    plant.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderID == 1,
-                                          orElse:
-                                              () => Stock(
-                                                stockID: 0,
-                                                cylinderID: 1,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
-
-                                int mediumQty =
-                                    plant.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderID == 2,
-                                          orElse:
-                                              () => Stock(
-                                                stockID: 0,
-                                                cylinderID: 2,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
-
-                                int largeQty =
-                                    plant.stock
-                                        .firstWhere(
-                                          (s) => s.cylinderID == 3,
-                                          orElse:
-                                              () => Stock(
-                                                stockID: 0,
-                                                cylinderID: 3,
-                                                quantityAvailable: 0,
-                                              ),
-                                        )
-                                        .quantityAvailable;
+                                // ✅ Fetch stock for each cylinder safely with price
+                                final smallStock = plant.stock.firstWhere(
+                                  (s) => s.cylinderID == 1,
+                                  orElse:
+                                      () => Stock(
+                                        stockID: 0,
+                                        cylinderID: 1,
+                                        quantityAvailable: 0,
+                                        price: 0,
+                                      ),
+                                );
+                                final mediumStock = plant.stock.firstWhere(
+                                  (s) => s.cylinderID == 2,
+                                  orElse:
+                                      () => Stock(
+                                        stockID: 0,
+                                        cylinderID: 2,
+                                        quantityAvailable: 0,
+                                        price: 0,
+                                      ),
+                                );
+                                final largeStock = plant.stock.firstWhere(
+                                  (s) => s.cylinderID == 3,
+                                  orElse:
+                                      () => Stock(
+                                        stockID: 0,
+                                        cylinderID: 3,
+                                        quantityAvailable: 0,
+                                        price: 0,
+                                      ),
+                                );
 
                                 return CustomCard(
                                   title: supplier.name,
@@ -386,9 +374,12 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                                   rating: '4.5',
                                   shopName: plant.plantName,
                                   shopCity: plant.plantCity,
-                                  smallQty: smallQty,
-                                  mediumQty: mediumQty,
-                                  largeQty: largeQty,
+                                  smallQty: smallStock.quantityAvailable,
+                                  mediumQty: mediumStock.quantityAvailable,
+                                  largeQty: largeStock.quantityAvailable,
+                                  smallPrice: smallStock.price.toDouble(),
+                                  mediumPrice: mediumStock.price.toDouble(),
+                                  largePrice: largeStock.price.toDouble(),
                                   onplaceorder: () {
                                     Navigator.push(
                                       context,
@@ -401,9 +392,15 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                                               supplierAddress: supplier.city,
                                               supplierCity: supplier.city,
                                               vendor: widget.vendor,
-                                              smallQty: smallQty,
-                                              mediumQty: mediumQty,
-                                              largeQty: largeQty,
+                                              smallQty:
+                                                  smallStock.quantityAvailable,
+                                              mediumQty:
+                                                  mediumStock.quantityAvailable,
+                                              largeQty:
+                                                  largeStock.quantityAvailable,
+                                              smallPrice: smallStock.price,
+                                              mediumPrice: mediumStock.price,
+                                              largePrice: largeStock.price,
                                             ),
                                       ),
                                     );
