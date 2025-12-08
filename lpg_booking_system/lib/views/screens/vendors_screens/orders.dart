@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/current_order_controller.dart';
 import 'package:lpg_booking_system/controllers/vendor_controller/past_order_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/repeat_order_controller.dart';
 import 'package:lpg_booking_system/models/vendors_models/currentorders_reponse.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/complaint_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
-
 import 'package:lpg_booking_system/views/screens/vendors_screens/view_order_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -25,6 +25,7 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
 
   final controller1 = VendorCurrentOrdersController();
   final controller2 = VendorPastOrdersController();
+  final repeatController = RepeatOrderController(); // Added repeat controller
 
   @override
   void initState() {
@@ -218,7 +219,6 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
                     "RATE ORDER",
                     Colors.white,
                     Colors.orange,
-
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -228,7 +228,7 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
                     },
                   ),
                 const SizedBox(width: 8),
-                // Past Orders: Complaint / Details button → CustomerOrderDetails
+                // Past Orders: Complaint / Details button
                 if (isPast)
                   _orderButton(
                     "COMPLAINT",
@@ -248,12 +248,60 @@ class _VendorOrdersScreenState extends State<OrdersScreen> {
                       );
                     },
                   ),
+                // Repeat Order button for past orders
+                if (isPast)
+                  _orderButton(
+                    "REPEAT ORDER",
+                    Colors.white,
+                    Colors.orange,
+                    onPressed: () async {
+                      await _handleRepeatOrder(order.orderId, order.buyerName);
+                    },
+                  ),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _handleRepeatOrder(int orderId, String buyerName) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Repeat Order"),
+            content: Text(
+              "Are you sure you want to repeat order #$orderId for $buyerName?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Yes, Repeat"),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed != true) return;
+
+    // Call repeat order API
+    final success = await repeatController.placeRepeatedOrder(orderId);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Order repeated successfully!")),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to repeat order")));
+    }
   }
 
   Widget _statusChip(String status) {

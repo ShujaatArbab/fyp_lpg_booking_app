@@ -15,6 +15,7 @@ class VendorOrderConfirmationScreen extends StatefulWidget {
   final String supplierAddress;
   final String supplierCity;
   final LoginResponse vendor;
+  final String shopId; // ✅ shopId added
 
   const VendorOrderConfirmationScreen({
     super.key,
@@ -25,6 +26,7 @@ class VendorOrderConfirmationScreen extends StatefulWidget {
     required this.supplierAddress,
     required this.supplierCity,
     required this.vendor,
+    required this.shopId, // ✅ required
   });
 
   @override
@@ -101,8 +103,9 @@ class _VendorOrderConfirmationScreenState
       final request = VendorOrderRequest(
         buyerId: widget.vendor.userid,
         sellerId: widget.supplierId,
+        shopId: widget.shopId, // ✅ Pass shopId to backend
         orderItems: orderItems,
-        totalPrice: getGrandTotal(), // ✅ Send total price to backend
+        totalPrice: getGrandTotal(), // ✅ total price
       );
 
       final response = await VendorOrder().vendorplacesorders(request);

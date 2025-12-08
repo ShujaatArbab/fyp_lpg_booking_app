@@ -12,12 +12,14 @@ class OrderItemRequest {
 class VendorOrderRequest {
   final String buyerId; // Vendor ID
   final String sellerId; // Supplier ID
+  final String shopId; // ✅ Shop ID
   final List<OrderItemRequest> orderItems;
   final int totalPrice;
 
   VendorOrderRequest({
     required this.buyerId,
     required this.sellerId,
+    required this.shopId, // ✅ required
     required this.orderItems,
     required this.totalPrice,
   });
@@ -26,6 +28,7 @@ class VendorOrderRequest {
     return {
       "Buyer_id": buyerId,
       "Seller_id": sellerId,
+      "Shop_id": shopId, // ✅ added
       "OrderItems": orderItems.map((e) => e.toJson()).toList(),
       "price": totalPrice,
     };

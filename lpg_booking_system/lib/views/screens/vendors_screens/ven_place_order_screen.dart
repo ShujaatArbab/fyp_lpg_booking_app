@@ -22,6 +22,7 @@ class VendorPlaceorderScreen extends StatefulWidget {
   final int smallPrice;
   final int mediumPrice;
   final int largePrice;
+  final String shopId;
 
   const VendorPlaceorderScreen({
     super.key,
@@ -37,6 +38,7 @@ class VendorPlaceorderScreen extends StatefulWidget {
     required this.smallPrice,
     required this.mediumPrice,
     required this.largePrice,
+    required this.shopId,
   });
 
   @override
@@ -368,6 +370,7 @@ class _VendorPlaceorderScreenState extends State<VendorPlaceorderScreen> {
                             supplierCity: widget.supplierCity,
                             vendor: widget.vendor,
                             supplierId: widget.supplierId,
+                            shopId: widget.shopId,
                           ),
                     ),
                   );

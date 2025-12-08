@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/placeorder_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/stockservices_controller.dart';
-import 'package:lpg_booking_system/controllers/customer_controller/accessories_controller.dart';
 import 'package:lpg_booking_system/global/tank_item.dart';
-import 'package:lpg_booking_system/models/customers_models/accessories_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/placeorder_request.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/finalorderconfirm_screen.dart';
@@ -57,32 +55,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     }
   }
 
-  /// Place accessories for a single cylinder
-  Future<void> placeAccessories(TankItem item) async {
-    if (item.accessories == null || item.accessories!.isEmpty) return;
-
-    final controller = AccessoriesController();
-
-    for (var acc in item.accessories!) {
-      var parts = acc.split(' x');
-      var purpose = parts[0].trim();
-      var quantity = int.tryParse(parts[1].trim()) ?? 1;
-
-      final request = AccessoriesRequest(
-        userId: widget.customer.userid,
-        cylinderId: getCylinderId(item.size),
-        usagePurpose: purpose,
-        quantity: quantity,
-      );
-
-      try {
-        await controller.placeAccessoriesOrder(request);
-      } catch (e) {
-        print("Accessories API failed for $purpose: $e");
-      }
-    }
-  }
-
   int getCylinderId(String size) {
     switch (size) {
       case '11kg':
@@ -96,7 +68,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     }
   }
 
-  /// Place order API call with total price
+  /// Place order + accessories API call (single API)
   Future<void> _placeOrder() async {
     if (widget.selecteditem.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,13 +84,32 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     final sellerId = widget.vendorId;
 
     try {
-      // Place accessories for each cylinder
-      for (var item in widget.selecteditem) {
-        await placeAccessories(item);
-      }
+      // Build order items with nested accessories
+      final orderItems =
+          widget.selecteditem.map((cylinder) {
+            return OrderItemRequest(
+              stockId: stockMap[cylinder.size]!,
+              quantity: cylinder.quantity,
+              accessories:
+                  cylinder.accessories != null
+                      ? cylinder.accessories!.map((acc) {
+                        var parts = acc.split(' x');
+                        var purpose = parts[0].trim();
+                        var quantity = int.tryParse(parts[1].trim()) ?? 1;
 
-      // Calculate grand total
-      int grandTotal = widget.selecteditem.fold(
+                        return AccessoryRequest(
+                          userId: widget.customer.userid,
+                          cylinderId: getCylinderId(cylinder.size),
+                          usagePurpose: purpose,
+                          quantity: quantity,
+                        );
+                      }).toList()
+                      : [],
+            );
+          }).toList();
+
+      // Calculate total price
+      int totalPrice = widget.selecteditem.fold(
         0,
         (sum, item) => sum + (item.price * item.quantity),
       );
@@ -128,17 +119,11 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
         buyerId: widget.customer.userid,
         sellerId: sellerId,
         city: widget.vendorcity,
-        totalPrice: grandTotal, // ✅ send total price to backend
-        items:
-            widget.selecteditem.map((c) {
-              return OrderItemRequest(
-                stockId: stockMap[c.size]!,
-                quantity: c.quantity,
-              );
-            }).toList(),
+        totalPrice: totalPrice,
+        orderItems: orderItems,
       );
 
-      // Place order API call
+      // Call single API
       final response = await OrderController().placeOrder(request);
       final orderId = response.orderId;
 
@@ -178,7 +163,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate grand total
     int grandTotal = widget.selecteditem.fold(
       0,
       (sum, item) => sum + (item.price * item.quantity),
@@ -187,9 +171,7 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
     return Scaffold(
       bottomNavigationBar: CustomerNavbar(
         currentindex: 0,
-        ontap: (int index) {
-          setState(() {});
-        },
+        ontap: (int index) => setState(() {}),
       ),
       appBar: AppBar(
         title: const Text(
@@ -201,7 +183,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
       ),
       body: Column(
         children: [
-          // Vendor & Customer Info
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(10),
@@ -244,8 +225,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
             ),
           ),
           const SizedBox(height: 10),
-
-          // List of cylinders
           Expanded(
             child:
                 widget.selecteditem.isEmpty
@@ -284,7 +263,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                             },
                           ),
                         ),
-                        // Show grand total below cards
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
@@ -309,8 +287,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
                       ],
                     ),
           ),
-
-          // Vendor location & phone
           Container(
             padding: const EdgeInsets.only(left: 50, bottom: 20),
             child: Column(
@@ -334,8 +310,6 @@ class _OrderconfirmationScreenState extends State<OrderconfirmationScreen> {
               ],
             ),
           ),
-
-          // Place Order Button
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: ElevatedButton(

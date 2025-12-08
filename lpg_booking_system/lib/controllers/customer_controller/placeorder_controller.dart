@@ -6,7 +6,7 @@ import 'package:lpg_booking_system/models/customers_models/placeorder_response.d
 
 class OrderController {
   Future<OrderResponse> placeOrder(OrderRequest request) async {
-    final url = Uri.parse("$baseurl/Orders/PlaceOrder");
+    final url = Uri.parse("$baseurl/Orders/PlaceOrderWithAccessories");
 
     final response = await http.post(
       url,
@@ -17,7 +17,9 @@ class OrderController {
     if (response.statusCode == 200) {
       return OrderResponse.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception("Failed to place order: ${response.body}");
+      throw Exception(
+        "Failed to place order. Status: ${response.statusCode}, Body: ${response.body}",
+      );
     }
   }
 }

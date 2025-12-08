@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/current_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/repeat_order_controller.dart';
+import 'package:lpg_booking_system/controllers/customer_controller/scheduled_controller.dart';
+
 import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
+import 'package:lpg_booking_system/models/customers_models/scheduled_request.dart';
+import 'package:lpg_booking_system/models/customers_models/scheduled_response.dart';
+
 import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
 
@@ -17,13 +23,15 @@ class MyOrdersScreen extends StatefulWidget {
 }
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
-  int selectedTab = 0; // 0 = current, 1 = past
+  int selectedTab = 0;
   bool isLoading = true;
   List<CustomerOrders> currentOrders = [];
   List<CustomerOrders> pastOrders = [];
 
   final currentController = CustomerOrdersController();
   final pastController = CustomerPastOrdersController();
+  final repeatController = RepeatOrderController();
+  final scheduleController = ScheduleController();
 
   @override
   void initState() {
@@ -39,6 +47,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         widget.buyerId.userid,
       );
       final past = await pastController.fetchPastOrders(widget.buyerId.userid);
+
       setState(() {
         currentOrders = current;
         pastOrders = past;
@@ -64,7 +73,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
       body: Column(
         children: [
-          // 🔸 Tabs
           Container(
             color: Colors.orange,
             child: Row(
@@ -75,8 +83,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               ],
             ),
           ),
-
-          // 🔹 Orders list
           Expanded(
             child:
                 isLoading
@@ -98,6 +104,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   Widget _tabButton(String title, int index) {
     final isSelected = selectedTab == index;
+
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => selectedTab = index),
@@ -148,7 +155,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     String cylinderList = order.items
         .map((item) => item.cylinderType)
         .toSet()
-        .join(" + "); // unique cylinder types
+        .join(" + ");
 
     return Card(
       elevation: 3,
@@ -159,7 +166,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Order ID + Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -174,13 +180,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               ],
             ),
             const SizedBox(height: 6),
-
             Text(
               "Items (${order.items.length.toString().padLeft(2, '0')})",
               style: const TextStyle(color: Colors.black54, fontSize: 14),
             ),
             const SizedBox(height: 4),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -200,9 +204,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children:
@@ -230,15 +232,21 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           Colors.white,
                           Colors.orange,
                           onPressed: () {
-                            // Navigate to the rating screen
                             showDialog(
                               context: context,
-                              barrierColor:
-                                  Colors.black38, // semi-transparent background
+                              barrierColor: Colors.black38,
                               builder:
                                   (context) =>
                                       RatingScreen(orderId: order.orderId),
                             );
+                          },
+                        ),
+                        _orderButton(
+                          "Repeat Order",
+                          Colors.white,
+                          Colors.orange,
+                          onPressed: () async {
+                            await _handleRepeatOrder(order.orderId);
                           },
                         ),
                       ]
@@ -256,18 +264,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
                             if (result != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text("Order canceled successfully"),
                                 ),
                               );
-
-                              // Remove from list instantly without refresh
                               setState(() {
                                 currentOrders.remove(order);
                               });
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text("Failed to cancel order"),
                                 ),
                               );
@@ -275,11 +281,23 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           },
                         ),
                         _orderButton(
-                          "TRACK ORDER",
+                          "Scheduled",
                           Colors.white,
-                          Colors.green,
-                          onPressed: () {
-                            // TRACK ORDER action (currently do nothing)
+                          const Color.fromARGB(255, 22, 141, 26),
+                          onPressed: () async {
+                            final selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now().add(
+                                Duration(days: 1),
+                              ),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2100),
+                              helpText: "Select schedule date",
+                            );
+
+                            if (selectedDate != null) {
+                              await _scheduleOrder(order.orderId, selectedDate);
+                            }
                           },
                         ),
                       ],
@@ -288,6 +306,91 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ),
       ),
     );
+  }
+
+  // ---------------------------------------------------
+  // 🔥 FIXED SCHEDULE METHOD
+  // ---------------------------------------------------
+  Future<void> _scheduleOrder(int orderId, DateTime selectedDate) async {
+    try {
+      // Create request
+      final request = ScheduleOrderRequest(
+        custId: widget.buyerId.userid, // Must include prefix e.g., "C-3506"
+        orderId: orderId,
+        scDate: selectedDate,
+      );
+
+      // API call
+      final response = await scheduleController.scheduleOrder(request);
+
+      if (response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Order scheduled on ${selectedDate.toLocal().toString().split(' ')[0]}",
+            ),
+          ),
+        );
+
+        // ✅ Update status locally in the UI
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to schedule order: $e")));
+    }
+  }
+
+  Future<void> _handleRepeatOrder(int orderId) async {
+    final orderDetails = await repeatController.fetchOrderDetails(orderId);
+    if (orderDetails == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to fetch order details")),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Repeat Order"),
+            content: Text(
+              "Are you sure you want to repeat order #$orderId from ${orderDetails.vendor.name}?",
+            ),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  "Yes, Repeat",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed != true) return;
+
+    final success = await repeatController.placeRepeatedOrder(orderId);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Order repeated successfully!")),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to repeat order")));
+    }
   }
 
   Widget _statusChip(String status) {
@@ -342,7 +445,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: ElevatedButton(
-          onPressed: onPressed, // <-- FIXED
+          onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: bgColor,
             foregroundColor: borderColor,

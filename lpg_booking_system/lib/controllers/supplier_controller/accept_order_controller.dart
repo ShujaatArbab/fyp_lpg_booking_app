@@ -8,7 +8,7 @@ class AcceptOrderSupplierController {
     required int orderId,
     required String supplierId,
   }) async {
-    final url = Uri.parse("$baseurl/Orders/AcceptOrder");
+    final url = Uri.parse("$baseurl/Orders/SupplierAcceptOrder");
 
     final body = json.encode({"OrderId": orderId, "SellerId": supplierId});
 

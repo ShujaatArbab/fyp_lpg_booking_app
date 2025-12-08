@@ -1,13 +1,42 @@
+class AccessoryResponse {
+  final int cylinderId;
+  final String usagePurpose;
+  final int quantity;
+
+  AccessoryResponse({
+    required this.cylinderId,
+    required this.usagePurpose,
+    required this.quantity,
+  });
+
+  factory AccessoryResponse.fromJson(Map<String, dynamic> json) {
+    return AccessoryResponse(
+      cylinderId: json['CylinderId'],
+      usagePurpose: json['UsagePurpose'],
+      quantity: json['Quantity'],
+    );
+  }
+}
+
 class OrderItemResponse {
   final int stockId;
   final int quantity;
+  final List<AccessoryResponse> accessories;
 
-  OrderItemResponse({required this.stockId, required this.quantity});
+  OrderItemResponse({
+    required this.stockId,
+    required this.quantity,
+    required this.accessories,
+  });
 
   factory OrderItemResponse.fromJson(Map<String, dynamic> json) {
     return OrderItemResponse(
       stockId: json['stock_id'],
       quantity: json['quantity'],
+      accessories:
+          (json['Accessories'] as List)
+              .map((a) => AccessoryResponse.fromJson(a))
+              .toList(),
     );
   }
 }
@@ -22,6 +51,7 @@ class OrderResponse {
   final double latitude;
   final double longitude;
   final String status;
+  final int price;
   final List<OrderItemResponse> items;
 
   OrderResponse({
@@ -34,6 +64,7 @@ class OrderResponse {
     required this.latitude,
     required this.longitude,
     required this.status,
+    required this.price,
     required this.items,
   });
 
@@ -48,9 +79,10 @@ class OrderResponse {
       latitude: (json['Latitude'] as num).toDouble(),
       longitude: (json['Longitude'] as num).toDouble(),
       status: json['Status'],
+      price: int.parse(json['Price'].toString()),
       items:
           (json['Items'] as List)
-              .map((e) => OrderItemResponse.fromJson(e))
+              .map((i) => OrderItemResponse.fromJson(i))
               .toList(),
     );
   }
