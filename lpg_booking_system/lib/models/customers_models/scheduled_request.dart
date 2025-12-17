@@ -10,8 +10,10 @@ class ScheduleOrderRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    "CustId": custId,
+    "CustId": custId, // Must match exactly like "C-3506"
     "OrderId": orderId,
-    "ScDate": scDate.toIso8601String(),
+    // Format date as "YYYY-MM-DD" to match API
+    "ScDate":
+        "${scDate.year.toString().padLeft(4, '0')}-${scDate.month.toString().padLeft(2, '0')}-${scDate.day.toString().padLeft(2, '0')}",
   };
 }

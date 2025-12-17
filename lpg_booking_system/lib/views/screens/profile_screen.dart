@@ -3,6 +3,7 @@ import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/my_orders_screen.dart';
+import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final LoginResponse profile;
@@ -147,7 +148,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              ShowVendorScreen(customer: widget.profile),
+                    ),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.only(left: 10),
                   width: 385,
@@ -168,7 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SizedBox(width: 100),
 
                           Text(
-                            'Address',
+                            'Home',
                             style: TextStyle(
                               color: Colors.orangeAccent,
                               fontSize: 20,
