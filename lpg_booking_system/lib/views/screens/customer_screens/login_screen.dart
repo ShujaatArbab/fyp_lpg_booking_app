@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/constants.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/login_controler.dart';
+import 'package:lpg_booking_system/controllers/delivery_person_controller/delivery_person_login_controller.dart';
+
 import 'package:lpg_booking_system/models/customers_models/login_request.dart';
+import 'package:lpg_booking_system/models/delivery_person_models/deliver_person_login_request.dart';
+
 import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
+import 'package:lpg_booking_system/views/screens/delivery_person_screens/get_orders_screen.dart';
+
 import 'package:lpg_booking_system/views/screens/roleselection_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_dashboard_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
+
 import 'package:lpg_booking_system/widgets/custom_button.dart';
 import 'package:lpg_booking_system/widgets/input_field.dart';
 
@@ -23,9 +30,11 @@ String erroremail = "";
 String errorpassword = "";
 
 class _LoginScreenState extends State<LoginScreen> {
-  //!  funtion
+  bool isobscure = true;
+
+  //! Function
   void checkvalidation() async {
-    // Validate inputs and update UI
+    // Validate inputs
     setState(() {
       erroremail = emailcontroller.text.isEmpty ? "Enter email" : "";
       errorpassword = passwordcontroller.text.isEmpty ? "Enter password" : "";
@@ -33,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (erroremail.isNotEmpty || errorpassword.isNotEmpty) return;
 
+    // 1️⃣ Try existing login first (Customer/Vendor/Supplier)
     final request = LoginRequest(
       email: emailcontroller.text.trim(),
       password: passwordcontroller.text.trim(),
@@ -41,50 +51,68 @@ class _LoginScreenState extends State<LoginScreen> {
     final response = await LoginController().login(request);
     print(response);
 
-    //!  login fails
-    if (response == null) {
-      ScaffoldMessenger.of(
+    if (response != null) {
+      // Login success for existing user types
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login Successful. Welcome ${response.name}!')),
+      );
+
+      if (response.userid.startsWith("V-")) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VendorDashboardScreen(vendor: response),
+          ),
+        );
+      } else if (response.userid.startsWith("C-")) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ShowVendorScreen(customer: response),
+          ),
+        );
+      } else if (response.userid.startsWith("S-")) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SupplierdashboardScreen(supplier: response),
+          ),
+        );
+      }
+      return; // exit after successful existing login
+    }
+
+    //! 2️⃣ Try delivery person login
+    final dpRequest = DeliveryLoginRequest(
+      dpEmail: emailcontroller.text.trim(),
+      dpPassword: passwordcontroller.text.trim(),
+    );
+
+    final dpResponse = await DeliveryLoginController().Deliverylogin(dpRequest);
+
+    if (dpResponse != null) {
+      // Delivery login success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login Successful. Welcome ${dpResponse.dpName}!'),
+        ),
+      );
+
+      Navigator.push(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid Credentials')));
+        MaterialPageRoute(
+          builder: (context) => DeliveryOrdersScreen(response: dpResponse),
+        ),
+      );
       return;
     }
 
-    // ✅ FIXED HERE
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Login Successful. Welcome ${response.name}!')),
-    );
-
-    if (response.userid.startsWith("V-")) {
-      // Vendor → go to Orders screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => VendorDashboardScreen(vendor: response),
-        ),
-      );
-    } else if (response.userid.startsWith("C-")) {
-      // Customer → go to vendor browsing screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => ShowVendorScreen(customer: response)),
-      );
-    } else if (response.userid.startsWith("S-")) {
-      // Customer → go to vendor browsing screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SupplierdashboardScreen(supplier: response),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Unknown user type")));
-    }
+    //! 3️⃣ If both fail
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Invalid Credentials')));
   }
 
-  bool isobscure = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-
             Row(
               children: [
                 Container(
@@ -114,7 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            //!text field email
             SizedBox(height: 30),
             SizedBox(
               width: 350,
@@ -127,7 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 errorText: erroremail,
               ),
             ),
-            //!text field password
             SizedBox(height: 30),
             SizedBox(
               width: 350,
@@ -150,7 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            //! button
             SizedBox(height: 30),
             Container(
               margin: EdgeInsets.only(left: 200),
@@ -161,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
             ),
-            //! create account
             SizedBox(height: 260),
             Container(
               margin: EdgeInsets.only(left: 70),

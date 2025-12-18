@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/notifications_controller.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/notifications_response.dart';
-import 'package:lpg_booking_system/views/screens/customer_screens/showvendor_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/show_supplier_screen.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class VendorNotificationsScreen extends StatefulWidget {
   final LoginResponse customer;
 
-  const NotificationsScreen({super.key, required this.customer});
+  const VendorNotificationsScreen({super.key, required this.customer});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  State<VendorNotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends State<VendorNotificationsScreen> {
   final NotificationController _notificationController =
       NotificationController();
 
@@ -112,8 +112,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder:
-                                            (context) => ShowVendorScreen(
-                                              customer: widget.customer,
+                                            (context) => Showsupplierscreen(
+                                              vendor: widget.customer,
                                             ),
                                       ),
                                     ),

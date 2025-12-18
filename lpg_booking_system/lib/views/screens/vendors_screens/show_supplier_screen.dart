@@ -6,9 +6,9 @@ import 'package:lpg_booking_system/models/vendors_models/show_supplier_request.d
 import 'package:lpg_booking_system/models/vendors_models/show_supplier_response.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/add_deliveryperson_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/add_shop_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/notification_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_dashboard_screen.dart';
-import 'package:lpg_booking_system/views/screens/customer_screens/notifications_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/vendor_profile.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/whichshop_order_screen.dart';
 import 'package:lpg_booking_system/widgets/custom_bottom_navbar.dart';
@@ -151,7 +151,7 @@ class _ShowsupplierscreenState extends State<Showsupplierscreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => NotificationsScreen(
+                                        (context) => VendorNotificationsScreen(
                                           customer: widget.vendor,
                                         ),
                                   ),

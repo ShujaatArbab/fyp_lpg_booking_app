@@ -18,9 +18,15 @@ class AddDeliveryPersonScreen extends StatefulWidget {
 class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
   final TextEditingController dpNameController = TextEditingController();
   final TextEditingController dpPhoneController = TextEditingController();
+  final TextEditingController dpEmailController =
+      TextEditingController(); // ✅ email
+  final TextEditingController dpPasswordController =
+      TextEditingController(); // ✅ password
 
   String errorDPName = "";
   String errorDPPhone = "";
+  String errorDPEmail = "";
+  String errorDPPassword = "";
 
   bool isLoading = false;
 
@@ -31,9 +37,15 @@ class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
       errorDPName =
           dpNameController.text.isEmpty ? "Enter delivery person name" : "";
       errorDPPhone = dpPhoneController.text.isEmpty ? "Enter phone number" : "";
+      errorDPEmail = dpEmailController.text.isEmpty ? "Enter email" : "";
+      errorDPPassword =
+          dpPasswordController.text.isEmpty ? "Enter password" : "";
     });
 
-    return errorDPName.isEmpty && errorDPPhone.isEmpty;
+    return errorDPName.isEmpty &&
+        errorDPPhone.isEmpty &&
+        errorDPEmail.isEmpty &&
+        errorDPPassword.isEmpty;
   }
 
   void saveDeliveryPerson() async {
@@ -44,9 +56,11 @@ class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
     });
 
     final request = AddDPRequest(
-      dpName: dpNameController.text,
-      dpPhone: dpPhoneController.text,
-      vendorId: widget.loginResponse.userid, // ✅ use login userid (vendor id)
+      dpName: dpNameController.text.trim(),
+      dpPhone: dpPhoneController.text.trim(),
+      dpEmail: dpEmailController.text.trim(), // ✅ email
+      dpPassword: dpPasswordController.text.trim(), // ✅ password
+      vendorId: widget.loginResponse.userid, // ✅ use vendor id
     );
 
     AddDPResponse? response = await _controller.addDeliveryPerson(request);
@@ -62,6 +76,8 @@ class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
 
       dpNameController.clear();
       dpPhoneController.clear();
+      dpEmailController.clear(); // ✅ clear email
+      dpPasswordController.clear(); // ✅ clear password
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -100,6 +116,24 @@ class _AddDeliveryPersonScreenState extends State<AddDeliveryPersonScreen> {
               decoration: InputDecoration(
                 labelText: "Phone Number",
                 errorText: errorDPPhone.isNotEmpty ? errorDPPhone : null,
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: dpEmailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: "Email",
+                errorText: errorDPEmail.isNotEmpty ? errorDPEmail : null,
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: dpPasswordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: "Password",
+                errorText: errorDPPassword.isNotEmpty ? errorDPPassword : null,
               ),
             ),
             const SizedBox(height: 30),
