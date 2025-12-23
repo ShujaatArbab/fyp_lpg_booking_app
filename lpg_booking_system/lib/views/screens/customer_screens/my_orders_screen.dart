@@ -1,18 +1,65 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:lpg_booking_system/controllers/customer_controller/cancel_order_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/current_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/repeat_order_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/scheduled_controller.dart';
-
 import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
 import 'package:lpg_booking_system/models/customers_models/scheduled_request.dart';
-import 'package:lpg_booking_system/models/customers_models/scheduled_response.dart';
-
 import 'package:lpg_booking_system/views/screens/customer_screens/order_details.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/rating_screen.dart';
+
+class OrderLocation {
+  final double latitude;
+  final double longitude;
+  final String deliveryPersonName;
+  final DateTime createdAt;
+
+  OrderLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.deliveryPersonName,
+    required this.createdAt,
+  });
+
+  factory OrderLocation.fromJson(Map<String, dynamic> json) {
+    return OrderLocation(
+      latitude: (json['Latitude'] as num).toDouble(),
+      longitude: (json['Longitude'] as num).toDouble(),
+      deliveryPersonName: json['DeliveryPersonName'],
+      createdAt: DateTime.parse(json['CreatedAt']),
+    );
+  }
+}
+
+class OrderTrackingService {
+  static const String baseurl =
+      "http://192.168.100.7/lpgbookingapp_api/api/OrderTrackings";
+
+  static Future<OrderLocation?> getLatestLocation(int orderId) async {
+    try {
+      final url = Uri.parse("$baseurl/GetLatestLocation?orderId=$orderId");
+      print("Fetching: $url");
+      final response = await http.get(url);
+      print("Status code: ${response.statusCode}");
+      print("Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return OrderLocation.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching location: $e");
+      return null;
+    }
+  }
+}
 
 class MyOrdersScreen extends StatefulWidget {
   final LoginResponse buyerId;
@@ -41,13 +88,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   Future<void> fetchOrders() async {
     setState(() => isLoading = true);
-
     try {
       final current = await currentController.fetchCurrentOrders(
         widget.buyerId.userid,
       );
       final past = await pastController.fetchPastOrders(widget.buyerId.userid);
-
       setState(() {
         currentOrders = current;
         pastOrders = past;
@@ -55,7 +100,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     } catch (e) {
       print("Error loading orders: $e");
     }
-
     setState(() => isLoading = false);
   }
 
@@ -104,7 +148,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   Widget _tabButton(String title, int index) {
     final isSelected = selectedTab == index;
-
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => selectedTab = index),
@@ -257,20 +300,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           Colors.red,
                           onPressed: () async {
                             final cancelController = CancelOrderController();
-
                             final result = await cancelController.cancelOrder(
                               CancelOrderRequest(orderId: order.orderId),
                             );
-
                             if (result != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Order canceled successfully"),
                                 ),
                               );
-                              setState(() {
-                                currentOrders.remove(order);
-                              });
+                              setState(() => currentOrders.remove(order));
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -283,21 +322,27 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                         _orderButton(
                           "Scheduled",
                           Colors.white,
-                          const Color.fromARGB(255, 22, 141, 26),
+                          Colors.yellow,
                           onPressed: () async {
                             final selectedDate = await showDatePicker(
                               context: context,
                               initialDate: DateTime.now().add(
-                                Duration(days: 1),
+                                const Duration(days: 1),
                               ),
                               firstDate: DateTime.now(),
                               lastDate: DateTime(2100),
                               helpText: "Select schedule date",
                             );
-
-                            if (selectedDate != null) {
+                            if (selectedDate != null)
                               await _scheduleOrder(order.orderId, selectedDate);
-                            }
+                          },
+                        ),
+                        _orderButton(
+                          "Track Order",
+                          Colors.white,
+                          const Color.fromARGB(255, 22, 141, 26),
+                          onPressed: () async {
+                            await _trackOrderOnMap(order.orderId);
                           },
                         ),
                       ],
@@ -308,21 +353,63 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ---------------------------------------------------
-  // 🔥 FIXED SCHEDULE METHOD
-  // ---------------------------------------------------
+  // ------------------------- Track Order -------------------------
+  Future<void> _trackOrderOnMap(int orderId) async {
+    final orderLocation = await OrderTrackingService.getLatestLocation(orderId);
+
+    if (orderLocation == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Location not found")));
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => Scaffold(
+              appBar: AppBar(
+                title: const Text("Order Location"),
+                backgroundColor: Colors.orange,
+              ),
+              body: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    orderLocation.latitude,
+                    orderLocation.longitude,
+                  ),
+                  zoom: 15,
+                ),
+                markers: {
+                  Marker(
+                    markerId: const MarkerId("delivery_person"),
+                    position: LatLng(
+                      orderLocation.latitude,
+                      orderLocation.longitude,
+                    ),
+                    infoWindow: InfoWindow(
+                      title: orderLocation.deliveryPersonName,
+                      snippet:
+                          "Updated at: ${orderLocation.createdAt.toLocal()}",
+                    ),
+                  ),
+                },
+              ),
+            ),
+      ),
+    );
+  }
+
+  // ------------------------- Schedule -------------------------
   Future<void> _scheduleOrder(int orderId, DateTime selectedDate) async {
     try {
-      // Create request
       final request = ScheduleOrderRequest(
-        custId: widget.buyerId.userid, // Must include prefix e.g., "C-3506"
+        custId: widget.buyerId.userid,
         orderId: orderId,
         scDate: selectedDate,
       );
-
-      // API call
       final response = await scheduleController.scheduleOrder(request);
-
       if (response != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -331,8 +418,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
           ),
         );
-
-        // ✅ Update status locally in the UI
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -341,6 +426,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
+  // ------------------------- Repeat Order -------------------------
   Future<void> _handleRepeatOrder(int orderId) async {
     final orderDetails = await repeatController.fetchOrderDetails(orderId);
     if (orderDetails == null) {
@@ -349,7 +435,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       );
       return;
     }
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
@@ -378,9 +463,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ],
           ),
     );
-
     if (confirmed != true) return;
-
     final success = await repeatController.placeRepeatedOrder(orderId);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -393,10 +476,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
+  // ------------------------- Widgets -------------------------
   Widget _statusChip(String status) {
     Color color;
     IconData icon;
-
     switch (status.toLowerCase()) {
       case 'scheduled':
         color = Colors.orange;
@@ -414,7 +497,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         color = Colors.grey;
         icon = Icons.help_outline;
     }
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(

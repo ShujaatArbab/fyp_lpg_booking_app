@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lpg_booking_system/controllers/delivery_person_controller/get_orders_controller.dart';
+import 'package:lpg_booking_system/controllers/delivery_person_controller/order_track_controller.dart';
 import 'package:lpg_booking_system/models/delivery_person_models/deliver_person_login_response.dart';
 import 'package:lpg_booking_system/models/delivery_person_models/get_orders_response.dart';
+import 'package:lpg_booking_system/models/delivery_person_models/track_order_request.dart';
 
 class DeliveryOrdersScreen extends StatefulWidget {
   final DeliveryLoginResponse response;
@@ -23,6 +26,102 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
     _ordersFuture = _controller.getDeliveryOrders(widget.response.dpName);
   }
 
+  void _openMapAndSelectLocation(int orderId, String deliveryPersonName) {
+    LatLng? selectedLocation;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Stack(
+                children: [
+                  GoogleMap(
+                    initialCameraPosition: const CameraPosition(
+                      target: LatLng(33.64098, 73.07782),
+                      zoom: 14,
+                    ),
+                    onTap: (LatLng location) {
+                      setModalState(() {
+                        selectedLocation = location;
+                      });
+                    },
+                    markers:
+                        selectedLocation == null
+                            ? {}
+                            : {
+                              Marker(
+                                markerId: const MarkerId("selected"),
+                                position: selectedLocation!,
+                              ),
+                            },
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    zoomGesturesEnabled: true,
+                    scrollGesturesEnabled: true,
+                    rotateGesturesEnabled: true,
+                    tiltGesturesEnabled: true,
+                  ),
+
+                  if (selectedLocation != null)
+                    Positioned(
+                      bottom: 20,
+                      left: 50,
+                      right: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                        ),
+                        onPressed: () async {
+                          if (selectedLocation == null) return;
+
+                          final model = OrderTrackingRequest(
+                            orderId: orderId,
+                            deliveryPersonName: deliveryPersonName,
+                            latitude: selectedLocation!.latitude,
+                            longitude: selectedLocation!.longitude,
+                          );
+
+                          bool success =
+                              await OrderTrackingService.saveLocation(model);
+
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Location saved successfully"),
+                              ),
+                            );
+                            Navigator.pop(context); // close modal
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Failed to save location"),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          "Save Location",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +135,9 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
       ),
       body: Column(
         children: [
-          // Delivery person info card (long like order cards)
+          // Delivery person info card
           Container(
-            width: 500,
+            width: double.infinity,
             height: 145,
             child: Card(
               elevation: 4,
@@ -49,68 +148,66 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: SizedBox(
-                  // Make card visually longer
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          "Delivery Person Information",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.orange[800],
-                          ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        "Delivery Person Information",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.orange[800],
                         ),
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            "Name : ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Text(
+                          "Name : ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            widget.response.dpName,
-                            style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          widget.response.dpName,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          "Phone : ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "Phone : ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                        Text(
+                          widget.response.dpPhone,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          "Vendor ID : ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            widget.response.dpPhone,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "Vendor ID : ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            widget.response.vendorId,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        Text(
+                          widget.response.vendorId,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -173,7 +270,12 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  _openMapAndSelectLocation(
+                                    order.orderId,
+                                    widget.response.dpName,
+                                  );
+                                },
                                 child: const Text(
                                   "Start",
                                   style: TextStyle(
