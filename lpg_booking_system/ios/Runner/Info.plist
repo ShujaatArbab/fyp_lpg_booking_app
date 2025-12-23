@@ -46,7 +46,7 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>GMSApiKey</key>
-	<string>AIzaSyA1KvqmxrPp7HkLx6Zqq_d6mQE1XzrWcj0</string>
+	<string></string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location to track delivery</string>
 
