@@ -111,7 +111,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
             const SizedBox(height: 8),
             Text("Vendor: ${order.vendorName}"),
             Text("Vendor City: ${order.vendorCity}"),
-            Text("Delivery City: ${order.city}"),
+
             Text("Status: ${order.status}"),
             const SizedBox(height: 12),
             Align(
@@ -131,7 +131,7 @@ class _SupplierOrdersScreenState extends State<SupplierOrdersScreen> {
                     MaterialPageRoute(
                       builder:
                           (context) => SupplierOrderDetailScreen(
-                            order: order, // pass the current order
+                            orderId: order.orderId, // pass the current order
                             supplierId: widget.supplierId.userid,
                           ),
                     ),

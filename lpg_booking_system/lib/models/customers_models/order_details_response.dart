@@ -7,6 +7,7 @@ class OrderDetailsResponse {
   final String status;
   final double latitude;
   final double longitude;
+
   final List<OrderItem> items;
 
   OrderDetailsResponse({
@@ -82,11 +83,13 @@ class OrderItem {
   final String cylinderType;
   final int quantity;
   final List<String> accessories;
+  final double price;
 
   OrderItem({
     required this.cylinderType,
     required this.quantity,
     required this.accessories,
+    required this.price,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
@@ -95,6 +98,7 @@ class OrderItem {
       quantity: json['Quantity'],
       accessories:
           (json['Accessories'] as List).map((e) => e.toString()).toList(),
+      price: (json['Price'] as num).toDouble(),
     );
   }
 }

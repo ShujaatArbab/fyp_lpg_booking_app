@@ -90,7 +90,7 @@ class _UpdatePricesScreenState extends State<UpdatePricesScreen> {
                       padding: EdgeInsets.symmetric(vertical: 12.0),
                       child: Center(
                         child: Text(
-                          'Vendor Shops',
+                          'Shops / Plants',
                           style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.bold,

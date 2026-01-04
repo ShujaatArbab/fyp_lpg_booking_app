@@ -6,6 +6,8 @@ import 'package:lpg_booking_system/models/vendors_models/vendor_dashboard_respon
 
 import 'package:lpg_booking_system/views/screens/suppliers_screens/show_orders_screen.dart';
 import 'package:lpg_booking_system/views/screens/suppliers_screens/supplier_profile.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/add_deliveryperson_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/add_shop_screen.dart';
 
 import 'package:lpg_booking_system/widgets/customer_navbar.dart';
 
@@ -141,6 +143,80 @@ class _SupplierdashboardScreenState extends State<SupplierdashboardScreen> {
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 230),
+            child: Row(
+              children: [
+                //! Add Shop
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                AddShopScreen(loginResponse: widget.supplier),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 50,
+                    margin: const EdgeInsets.only(right: 10),
+                    child: Card(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.add_business, size: 22, color: Colors.red),
+                          Text(
+                            'Add Plant',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                //! Add Delivery Person
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => AddDeliveryPersonScreen(
+                              loginResponse: widget.supplier,
+                            ),
+                      ),
+                    );
+                  },
+                  child: SizedBox(
+                    width: 60,
+                    height: 50,
+                    child: Card(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.person_add, size: 22, color: Colors.red),
+                          Text(
+                            'Person',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

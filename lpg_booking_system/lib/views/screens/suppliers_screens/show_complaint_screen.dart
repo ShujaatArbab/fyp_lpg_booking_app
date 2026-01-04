@@ -31,7 +31,7 @@ class _ShowComplaintsScreenState extends State<ShowSupplierComplaintsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Vendor Complaints',
+          'Complaints',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

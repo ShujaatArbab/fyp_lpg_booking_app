@@ -63,20 +63,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
-  /// Fixed cylinder prices
-  double getCylinderPrice(String size) {
-    switch (size.toLowerCase()) {
-      case "11kg":
-        return 2780;
-      case "15kg":
-        return 3720;
-      case "45kg":
-        return 11160;
-      default:
-        return 0;
-    }
-  }
-
   Future<void> _acceptOrder() async {
     if (orderDetails == null) return;
 
@@ -180,22 +166,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       );
     }
 
-    final itemDetails =
-        orderDetails!.items.map((item) {
-          final price = getCylinderPrice(item.cylinderType);
-          final total = price * item.quantity;
-          return {
-            "size": item.cylinderType,
-            "quantity": item.quantity,
-            "price": price,
-            "total": total,
-          };
-        }).toList();
+    // ------------------ GROUP ITEMS BY CYLINDER SIZE ------------------
+    final Map<String, Map<String, dynamic>> groupedItems = {};
+    for (var item in orderDetails!.items) {
+      final size = item.cylinderType;
+      final price = item.price ?? 0;
 
-    final double grandTotal = itemDetails.fold(
-      0.0,
-      (sum, item) => sum + (item["total"] as num).toDouble(),
-    );
+      if (groupedItems.containsKey(size)) {
+        groupedItems[size]!['quantity'] += item.quantity;
+      } else {
+        groupedItems[size] = {'quantity': item.quantity, 'price': price};
+      }
+    }
+
+    final List<Map<String, dynamic>> itemDetails =
+        groupedItems.entries
+            .map(
+              (e) => {
+                "size": e.key,
+                "quantity": e.value['quantity'],
+                "price": e.value['price'],
+              },
+            )
+            .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -313,7 +306,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
             const SizedBox(height: 20),
 
-            /// Cylinder Detail Table
+            /// Cylinder Detail Table (Updated: grouped)
             const Text(
               "Cylinder Detail",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -337,9 +330,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ),
                         Expanded(
                           child: Text("Price", textAlign: TextAlign.center),
-                        ),
-                        Expanded(
-                          child: Text("Total", textAlign: TextAlign.center),
                         ),
                       ],
                     ),
@@ -365,24 +355,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                            Expanded(
-                              child: Text(
-                                "Rs. ${item["total"]}",
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
                           ],
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "Grand Total: Rs. $grandTotal/-",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
                         ),
                       ),
                     ),

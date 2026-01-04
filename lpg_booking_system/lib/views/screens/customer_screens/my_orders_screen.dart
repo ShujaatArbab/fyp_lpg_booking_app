@@ -7,6 +7,7 @@ import 'package:lpg_booking_system/controllers/customer_controller/current_order
 import 'package:lpg_booking_system/controllers/customer_controller/past_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/repeat_order_controller.dart';
 import 'package:lpg_booking_system/controllers/customer_controller/scheduled_controller.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
 import 'package:lpg_booking_system/models/customers_models/cancel_order_request.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/models/customers_models/my_orders_response.dart';
@@ -38,12 +39,11 @@ class OrderLocation {
 }
 
 class OrderTrackingService {
-  static const String baseurl =
-      "http://192.168.100.7/lpgbookingapp_api/api/OrderTrackings";
-
   static Future<OrderLocation?> getLatestLocation(int orderId) async {
     try {
-      final url = Uri.parse("$baseurl/GetLatestLocation?orderId=$orderId");
+      final url = Uri.parse(
+        "$baseurl/OrderTrackings/GetLatestLocation?orderid=$orderId",
+      );
       print("Fetching: $url");
       final response = await http.get(url);
       print("Status code: ${response.statusCode}");

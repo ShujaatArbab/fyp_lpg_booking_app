@@ -86,7 +86,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Shop',
+          'Add Shop/Plant',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
