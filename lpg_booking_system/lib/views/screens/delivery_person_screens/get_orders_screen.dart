@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:lpg_booking_system/controllers/delivery_person_controller/get_orders_controller.dart';
 import 'package:lpg_booking_system/controllers/delivery_person_controller/order_track_controller.dart';
+import 'package:lpg_booking_system/global/global_ip.dart';
 import 'package:lpg_booking_system/models/delivery_person_models/deliver_person_login_response.dart';
 import 'package:lpg_booking_system/models/delivery_person_models/get_orders_response.dart';
 import 'package:lpg_booking_system/models/delivery_person_models/track_order_request.dart';
@@ -24,6 +27,41 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
   void initState() {
     super.initState();
     _ordersFuture = _controller.getDeliveryOrders(widget.response.dpName);
+  }
+
+  // --- API call to set delivered ---
+  Future<void> setOrderDelivered(int orderId) async {
+    final url = Uri.parse(
+      "$baseurl/DeliveryPersons/SetOrderDelivered?orderId=$orderId",
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(orderId), // send just the orderId
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Order Delivered')),
+        );
+        // Refresh the orders list after delivery
+        setState(() {
+          _ordersFuture = _controller.getDeliveryOrders(widget.response.dpName);
+        });
+      } else {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Failed to deliver order')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
   }
 
   void _openMapAndSelectLocation(int orderId, String deliveryPersonName) {
@@ -65,7 +103,6 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
                     rotateGesturesEnabled: true,
                     tiltGesturesEnabled: true,
                   ),
-
                   if (selectedLocation != null)
                     Positioned(
                       bottom: 20,
@@ -261,29 +298,50 @@ class _DeliveryOrdersScreenState extends State<DeliveryOrdersScreen> {
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    _openMapAndSelectLocation(
+                                      order.orderId,
+                                      widget.response.dpName,
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Start",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                onPressed: () {
-                                  _openMapAndSelectLocation(
-                                    order.orderId,
-                                    widget.response.dpName,
-                                  );
-                                },
-                                child: const Text(
-                                  "Start",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                const SizedBox(width: 10),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setOrderDelivered(order.orderId);
+                                  },
+                                  child: const Text(
+                                    "Set Delivered",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         ),

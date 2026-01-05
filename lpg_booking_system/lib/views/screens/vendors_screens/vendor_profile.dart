@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lpg_booking_system/models/customers_models/login_response.dart';
 import 'package:lpg_booking_system/views/screens/change_password_screen.dart';
 import 'package:lpg_booking_system/views/screens/customer_screens/login_screen.dart';
+import 'package:lpg_booking_system/views/screens/vendors_screens/monthly_order_summary_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/orders.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/see_scheduled_order_screen.dart';
 import 'package:lpg_booking_system/views/screens/vendors_screens/show_complaints_screen.dart';
@@ -358,6 +359,63 @@ class _ProfileScreenState extends State<VendorProfileScreen> {
                           ),
 
                           SizedBox(width: 10),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.orangeAccent,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => MonthlyOrderSummaryScreen(
+                            summary: widget.profile,
+                          ),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10),
+                  width: 385,
+                  height: 70,
+                  child: Card(
+                    color: Colors.white,
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(left: 20),
+                            child: Icon(
+                              Icons.message,
+                              color: Colors.orangeAccent,
+                              size: 30,
+                            ),
+                          ),
+                          SizedBox(width: 60),
+
+                          Text(
+                            'Orders Summary',
+                            style: TextStyle(
+                              color: Colors.orangeAccent,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          SizedBox(width: 50),
                           Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.orangeAccent,
