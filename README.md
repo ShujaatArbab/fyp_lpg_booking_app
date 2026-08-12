@@ -214,6 +214,7 @@ The LPG Booking System follows the MVC (Model-View-Controller) architecture in t
 - SQL Server Management Studio (SSMS)
 - Git
 
+Internal project — © All rights reserved.﻿
 
 
 
