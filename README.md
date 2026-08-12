@@ -182,6 +182,38 @@ It connects customers, vendors, suppliers, and delivery personnel to streamline 
 - Helps maintain continuous LPG availability for vendors and customers.
 
 
+## Frontend
+
+- **Flutter** – Used to develop the mobile application and user interface.
+- **Dart** – Used as the programming language for Flutter development.
+- **Android Studio / Visual Studio Code** – Used for development, debugging, and testing.
+
+
+## Backend
+
+- **C#/.NET Entity Framework** – Used for backend development and API implementation.
+- **SQL Server Management Studio (SSMS)** – Used to manage and maintain the database.
+
+
+## Project Architecture
+**MVC Structure**
+The LPG Booking System follows the MVC (Model-View-Controller) architecture in the frontend to keep the application organized, modular, and easy to maintain.
+
+- **Model:** Manages application data, API responses, and data structures.
+- **View:** Contains the user interface screens and displays information to users.
+- **Controller:** Handles user actions, application logic, and communication between the View and Model.
+- **Service/API:** Handles communication between the Flutter application and the backend APIs.
+
+
+## Getting Started
+- Flutter SDK
+- Dart SDK (included with Flutter)
+- Android Studio or Visual Studio Code
+- .NET SDK (compatible with the backend project)
+- SQL Server
+- SQL Server Management Studio (SSMS)
+- Git
+
 
 
 
