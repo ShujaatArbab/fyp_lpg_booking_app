@@ -6,11 +6,18 @@ It connects customers, vendors, suppliers, and delivery personnel to streamline 
 <img width="746" height="815" alt="image" src="https://github.com/user-attachments/assets/5982d64e-bc31-435a-9fb9-ab6b358e5720" />
 
 
-## Sign up / Role Selection
-<p>
-  <img width="455" height="953" alt="image" src="https://github.com/user-attachments/assets/4fe74187-79fa-42a3-9779-91ceb8b48ec4" />
-  <img width="456" height="953" alt="image" src="https://github.com/user-attachments/assets/027cc7ac-ac87-47b9-8854-a7387d6678b9" />
-</p>
+## Role Selection
+<img width="455" height="953" alt="image" src="https://github.com/user-attachments/assets/4fe74187-79fa-42a3-9779-91ceb8b48ec4" />
+
+- Allows users to select their role before accessing the LPG Booking System.
+- Provides separate options for Customer, Vendor, and Supplier.
+- Redirects users to the appropriate registration or login process based on their selected role.
+- Ensures role-based access to relevant system features and functionality
+
+
+## Sign up
+<img width="456" height="953" alt="image" src="https://github.com/user-attachments/assets/1121b0f3-46ce-468e-9b85-a32f929c3436" />
+
 
 - Allows new users to create an account by providing their basic information.
 - Supports registration for different roles such as Customer, Vendor, and Supplier.
@@ -37,16 +44,21 @@ It connects customers, vendors, suppliers, and delivery personnel to streamline 
 
 
 ## Order Placement
-<p>
-  <img width="250" alt="Order Placement Screen 1" src="https://github.com/user-attachments/assets/9197d410-cf5f-4f09-ab00-623a709291cc" />
-  <img width="250" alt="Order Placement Screen 2" src="https://github.com/user-attachments/assets/2d20bc78-25a6-4582-bed6-bf7ec402b7e7" />
-</p>
+<img width="250" alt="Order Placement Screen 1" src="https://github.com/user-attachments/assets/9197d410-cf5f-4f09-ab00-623a709291cc" />
+
 
 - Allows customers to select the LPG cylinder size, quantity, and purpose of the order.
 - Customers can choose additional options or accessories according to their requirements.
 - Provides a simple interface to enter all necessary booking details before confirmation.
 - Helps ensure accurate order information for smooth processing and delivery.
 
+## Order Purpose Screen
+<img width="250" alt="Order Placement Screen 2" src="https://github.com/user-attachments/assets/2d20bc78-25a6-4582-bed6-bf7ec402b7e7" />
+
+- Allows customers to select the purpose for ordering an LPG cylinder.
+- Provides options such as Cooking, Stove, Geyser, Outdoor/BBQ, and Other.
+- Helps customers specify how the LPG cylinder will be used.
+- This information helps vendors better understand customer requirements and manage orders accordingly.
 
 ## Order Confirmation
 <img width="458" height="967" alt="image" src="https://github.com/user-attachments/assets/434657ee-f6c4-44f3-a786-ab07e14aecf6" />
